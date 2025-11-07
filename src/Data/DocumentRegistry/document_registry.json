@@ -1,0 +1,18 @@
+{
+  "doc_20251103_192313_0": {
+    "file_name": "README.md",
+    "file_path": "./Input/ContextLibrary\\README.md",
+    "file_hash": "7cf7bd90b9e9bc8c6cbd6abd57bb53ef",
+    "file_size": 1036,
+    "file_mtime": 1762151030.9950745,
+    "file_type": ".md",
+    "processed_date": "2025-11-03T19:23:13.082052",
+    "document_count": 1,
+    "collections": [
+      "documentation"
+    ],
+    "context_type": "documentation",
+    "processing_time": 4.84289,
+    "success": true
+  }
+}

@@ -1,0 +1,92 @@
+<span><span style="color: rgb(150, 34, 73); font-weight: bold;">&lt;title&gt;</span><span style="color: black; font-weight: normal;">Test Image Context File</span><span style="color: rgb(150, 34, 73); font-weight: bold;">&lt;/title&gt;</span><br><br></span>
+    <span><span style="color: rgb(150, 34, 73); font-weight: bold;">&lt;style&gt;</span><span style="color: black; font-weight: normal;">
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .form-container { border: 1px solid #ddd; padding: 20px; border-radius: 5px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="file"] { margin-bottom: 15px; }
+        textarea { width: 100%; padding: 8px; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none;
+                border-radius: 5px; cursor: pointer; margin-top: 20px; }
+        .result { margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 5px; display: none; }
+    </span><span style="color: rgb(150, 34, 73); font-weight: bold;">&lt;/style&gt;</span><br><br></span>
+
+
+    <h1>Test Image as Context File</h1>
+
+    <div class="form-container">
+        <span><span style="color: rgb(150, 34, 73); font-weight: bold;">&lt;form&gt;</span><span style="color: black; font-weight: normal;">
+
+                User Stories File (.xlsx):
+
+
+
+
+                Context Image File:
+
+
+
+
+                Parameters:
+                {"batch_size": 5, "parallel": false, "process_context": true, "force_reprocess": true}
+
+
+            Process Stories with Image Context
+        </span><span style="color: rgb(150, 34, 73); font-weight: bold;">&lt;/form&gt;</span><br><br></span>
+
+        <div class="result"></div>
+    </div>
+
+    <span><span style="color: rgb(150, 34, 73); font-weight: bold;">&lt;script&gt;</span><span style="color: black; font-weight: normal;">
+        document.getElementById('upload-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Processing request...';
+
+            const formData = new FormData();
+            formData.append('user_stories_file', document.getElementById('user_stories_file').files[0]);
+
+            // Add context file if selected
+            const contextFile = document.getElementById('context_file').files[0];
+            if (contextFile) {
+                formData.append('context_file', contextFile);
+            }
+
+            formData.append('params', document.getElementById('params').value);
+
+            try {
+                const response = await fetch('http://localhost:7979/api/process-stories', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        &lt;h3&gt;Success!&lt;/h3&gt;
+                        &lt;p&gt;Job ID: \${data.job_id}&lt;/p&gt;
+                        &lt;p&gt;Status: \${data.status}&lt;/p&gt;
+                        &lt;p&gt;\${data.message}&lt;/p&gt;
+                        &lt;p&gt;Check back in a few minutes to download results at:&lt;/p&gt;
+                        &lt;p&gt;&lt;a href="http://localhost:7979/api/download-results/\${data.job_id}" target="_blank"&gt;
+                            Download Results for Job \${data.job_id}
+                        &lt;/a&gt;&lt;/p&gt;
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        &lt;h3&gt;Error&lt;/h3&gt;
+                        &lt;p&gt;Status: \${response.status}&lt;/p&gt;
+                        &lt;p&gt;\${data.detail || JSON.stringify(data)}&lt;/p&gt;
+                    `;
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    &lt;h3&gt;Error&lt;/h3&gt;
+                    &lt;p&gt;\${error.message}&lt;/p&gt;
+                `;
+            }
+        });
+    </span><span style="color: rgb(150, 34, 73); font-weight: bold;">&lt;/script&gt;</span><br><br></span>

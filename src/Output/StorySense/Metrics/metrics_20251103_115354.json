@@ -1,0 +1,64 @@
+{
+  "app": "StorySense",
+  "version": "1.0.0",
+  "start_time": "2025-11-03T11:50:32.633670",
+  "end_time": "2025-11-03T11:53:54.209697",
+  "total_duration": 201.5760955810547,
+  "user_stories": {
+    "BRLLR043-SC011": {
+      "processing_time": 0.0019297599792480469,
+      "context_count": 0,
+      "context_quality": "none",
+      "overall_score": 5.0
+    }
+  },
+  "batches": {
+    "1": {
+      "story_count": 1,
+      "processing_time": 1.7499418258666992,
+      "stories_per_second": 0.5714475676954157
+    }
+  },
+  "llm": {
+    "total_calls": 0,
+    "total_tokens": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_latency": 0,
+    "avg_latency": 0,
+    "calls_by_type": {},
+    "guardrail_interventions": 0
+  },
+  "vector_db": {
+    "store_operations": 0,
+    "query_operations": 0,
+    "total_vectors_stored": 0,
+    "total_query_time": 0,
+    "total_store_time": 0,
+    "avg_query_time": 0,
+    "avg_store_time": 0
+  },
+  "system": {
+    "start_memory": 277.625,
+    "peak_memory": 288.84765625,
+    "end_memory": 258.84375,
+    "cpu_percent": 6.9
+  },
+  "errors": {
+    "total": 0,
+    "by_type": {}
+  },
+  "costs": {
+    "llm": {
+      "total_cost": 0,
+      "input_cost": 0,
+      "output_cost": 0,
+      "total_cost_inr": 0,
+      "input_cost_inr": 0,
+      "output_cost_inr": 0,
+      "by_model": {}
+    },
+    "total_estimated_cost": 0,
+    "total_estimated_cost_inr": 0
+  }
+}
