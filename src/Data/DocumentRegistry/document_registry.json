@@ -14,5 +14,21 @@
     "context_type": "documentation",
     "processing_time": 4.84289,
     "success": true
+  },
+  "doc_20251111_165803_1": {
+    "file_name": "Image.jpg",
+    "file_path": "C:\\Users\\910464\\AppData\\Local\\Temp\\story_sense_temp\\6ce43cf5-ac07-480f-918b-3aa336107a3a\\temp_context_library\\Image.jpg",
+    "file_hash": "fa3b992059d2609d24da2109a4782958",
+    "file_size": 49288,
+    "file_mtime": 1762860445.928978,
+    "file_type": ".jpg",
+    "processed_date": "2025-11-11T16:58:03.395404",
+    "document_count": 1,
+    "collections": [
+      "documentation"
+    ],
+    "context_type": "documentation",
+    "processing_time": 6.9773948192596436,
+    "success": true
   }
 }

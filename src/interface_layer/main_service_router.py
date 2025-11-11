@@ -93,26 +93,14 @@ async def process_stories_with_image_support(
         # Update job status
         active_jobs[job_id]["status"] = "processing"
 
-        # Step 1: If context file is an image, we need to handle it specially
-        if context_path and context_is_image:
-            # Create temporary context library with the image
-            temp_context_dir = os.path.join(TEMP_DIR, job_id, "temp_context_library")
-            wireframes_dir = os.path.join(temp_context_dir, "wireframes")
-            os.makedirs(wireframes_dir, exist_ok=True)
-
-            # Copy the image to wireframes directory
-            image_filename = os.path.basename(context_path)
-            target_path = os.path.join(wireframes_dir, image_filename)
-            shutil.copy(context_path, target_path)
-
-            # Process the context library first
-            logger.info(f"Processing image context file in temporary context library")
-
+        # Step 1: If we have context files (including images), process them
+        if context_path:
             # Initialize StorySenseGenerator
             ssg = StorySenseGenerator(user_stories_path)
 
-            # Process the context library with the image
-            ssg.process_context_library(temp_context_dir, force_reprocess=True)
+            # Process the context library (context_path is already a directory with files)
+            logger.info(f"Processing context files from directory: {context_path}")
+            ssg.process_context_library(context_path, force_reprocess=force_reprocess)
 
             # Now process user stories (without passing context_path since we've already processed it)
             ssg.process_user_stories(batch_size=batch_size, parallel=parallel)
@@ -196,10 +184,11 @@ async def process_historical_context(job_id: str, zip_path: str, extract_dir: st
 
 @story_sense_router.post("/process-stories", response_model=dict)
 async def upload_and_process(
-        background_tasks: BackgroundTasks,
-        user_stories_file: UploadFile = File(...),
-        context_file: Optional[UploadFile] = None,
-        params: str = Form("{}")
+    background_tasks: BackgroundTasks,
+    user_stories_file: UploadFile = File(...),
+    # Support multiple context files (images, pdf, docx, csv, xlsx, zip, etc.)
+    context_files: Optional[List[UploadFile]] = File(None),
+    params: str = Form("{}")
 ):
     """
     Endpoint to upload user stories and optional context files,
@@ -223,40 +212,71 @@ async def upload_and_process(
         with open(user_stories_path, "wb") as f:
             shutil.copyfileobj(user_stories_file.file, f)
 
-        # Save context file if provided
+        # Save context files if provided (support multiple files)
         context_path = None
-        if context_file:
-            context_path = os.path.join(job_dir, context_file.filename)
-            with open(context_path, "wb") as f:
-                shutil.copyfileobj(context_file.file, f)
+        context_is_image = False
+        if context_files:
+            temp_context_dir = os.path.join(job_dir, "temp_context_library")
+            wireframes_dir = os.path.join(temp_context_dir, "wireframes")
+            os.makedirs(temp_context_dir, exist_ok=True)
+            os.makedirs(wireframes_dir, exist_ok=True)
 
-            # Check if context is an image file
+            saved_context_filenames = []
             image_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff', '.webp']
-            if any(context_file.filename.lower().endswith(ext) for ext in image_extensions):
-                context_is_image = True
-                logger.info(f"Detected image context file: {context_file.filename}")
+
+            for cfile in context_files:
+                target_path = os.path.join(temp_context_dir, cfile.filename)
+                with open(target_path, "wb") as f:
+                    shutil.copyfileobj(cfile.file, f)
+                saved_context_filenames.append(cfile.filename)
+
+                # If it's an image, also copy to wireframes folder for the context processor
+                if any(cfile.filename.lower().endswith(ext) for ext in image_extensions):
+                    context_is_image = True
+                    wf_target = os.path.join(wireframes_dir, cfile.filename)
+                    # copy file again (or move)
+                    shutil.copy(target_path, wf_target)
+                    logger.info(f"Saved image context file to wireframes: {cfile.filename}")
+
+            context_path = temp_context_dir
+            logger.info(f"Saved {len(saved_context_filenames)} context file(s) for job {job_id}: {saved_context_filenames}")
 
         # Create job entry
         active_jobs[job_id] = {
             "id": job_id,
             "status": "submitted",
             "user_stories_file": user_stories_file.filename,
-            "context_file": context_file.filename if context_file else None,
+            "context_files": [f.filename for f in context_files] if context_files else None,
             "params": request_params.dict(),
             "output_files": []
         }
 
         # Start background processing task
-        background_tasks.add_task(
-            process_stories,
-            job_id,
-            user_stories_path,
-            context_path,
-            request_params.batch_size,
-            request_params.parallel,
-            request_params.process_context,
-            request_params.force_reprocess
-        )
+        # Start background processing task. If we detected image context files, use the
+        # image-support-aware background task so images are placed correctly in the context library.
+        if context_is_image:
+            background_tasks.add_task(
+                process_stories_with_image_support,
+                job_id,
+                user_stories_path,
+                context_path,
+                True if context_is_image else False,
+                request_params.batch_size,
+                request_params.parallel,
+                request_params.process_context,
+                request_params.force_reprocess
+            )
+        else:
+            background_tasks.add_task(
+                process_stories,
+                job_id,
+                user_stories_path,
+                context_path,
+                request_params.batch_size,
+                request_params.parallel,
+                request_params.process_context,
+                request_params.force_reprocess
+            )
 
         return {
             "job_id": job_id,

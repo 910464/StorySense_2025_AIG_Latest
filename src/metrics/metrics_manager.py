@@ -349,7 +349,8 @@ class MetricsManager:
 
         try:
             namespace = f"StorySense/{self.app_name}"
-            timestamp = datetime.now()
+            # Use UTC time to avoid timezone issues with CloudWatch
+            timestamp = datetime.utcnow()
 
             metric_data = []
             for name, value in metrics_data.items():

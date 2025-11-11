@@ -1,0 +1,85 @@
+{
+  "app": "StorySense",
+  "version": "1.0.0",
+  "start_time": "2025-11-11T16:43:37.037451",
+  "end_time": "2025-11-11T16:44:15.175212",
+  "total_duration": 38.137773513793945,
+  "user_stories": {
+    "BRLLR043-SC011": {
+      "processing_time": 11.006091117858887,
+      "context_count": 0,
+      "context_quality": "none",
+      "overall_score": 10.0
+    }
+  },
+  "batches": {
+    "1": {
+      "story_count": 1,
+      "processing_time": 11.299118757247925,
+      "stories_per_second": 0.08850247718288125
+    }
+  },
+  "llm": {
+    "total_calls": 1,
+    "total_tokens": 2174,
+    "input_tokens": 1496,
+    "output_tokens": 678,
+    "total_latency": 9.43683385848999,
+    "avg_latency": 9.43683385848999,
+    "calls_by_type": {
+      "analysis": {
+        "calls": 1,
+        "input_tokens": 1496,
+        "output_tokens": 678,
+        "total_tokens": 2174,
+        "latency": 9.43683385848999,
+        "guardrail_interventions": 0
+      }
+    },
+    "guardrail_interventions": 0
+  },
+  "vector_db": {
+    "store_operations": 0,
+    "query_operations": 0,
+    "total_vectors_stored": 0,
+    "total_query_time": 0,
+    "total_store_time": 0,
+    "avg_query_time": 0,
+    "avg_store_time": 0
+  },
+  "system": {
+    "start_memory": 398.171875,
+    "peak_memory": 421.671875,
+    "end_memory": 421.96875,
+    "cpu_percent": 3.2
+  },
+  "errors": {
+    "total": 0,
+    "by_type": {}
+  },
+  "costs": {
+    "llm": {
+      "total_cost": 0.014658000000000001,
+      "input_cost": 0.004488,
+      "output_cost": 0.01017,
+      "total_cost_inr": 1.223943,
+      "input_cost_inr": 0.37474799999999997,
+      "output_cost_inr": 0.849195,
+      "by_model": {
+        "anthropic.claude-3-sonnet-20240229-v1:0": {
+          "calls": 1,
+          "input_tokens": 1496,
+          "output_tokens": 678,
+          "total_cost": 0.014658000000000001,
+          "input_cost": 0.004488,
+          "output_cost": 0.01017,
+          "total_cost_inr": 1.223943,
+          "input_cost_inr": 0.37474799999999997,
+          "output_cost_inr": 0.849195
+        }
+      }
+    },
+    "total_estimated_cost": 0.014658000000000001,
+    "total_estimated_cost_inr": 1.223943
+  }
+}

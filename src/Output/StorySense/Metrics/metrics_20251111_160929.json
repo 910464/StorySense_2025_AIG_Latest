@@ -1,0 +1,101 @@
+{
+  "app": "StorySense",
+  "version": "1.0.0",
+  "start_time": "2025-11-11T16:07:51.353250",
+  "end_time": "2025-11-11T16:09:29.355034",
+  "total_duration": 98.00180101394653,
+  "user_stories": {
+    "BRLLR043-SC011": {
+      "processing_time": 45.43479561805725,
+      "context_count": 8,
+      "context_quality": "low",
+      "overall_score": 10.0
+    }
+  },
+  "batches": {
+    "1": {
+      "story_count": 1,
+      "processing_time": 45.710203647613525,
+      "stories_per_second": 0.02187695350712376
+    }
+  },
+  "llm": {
+    "total_calls": 1,
+    "total_tokens": 1995,
+    "input_tokens": 1496,
+    "output_tokens": 499,
+    "total_latency": 7.316035032272339,
+    "avg_latency": 7.316035032272339,
+    "calls_by_type": {
+      "analysis": {
+        "calls": 1,
+        "input_tokens": 1496,
+        "output_tokens": 499,
+        "total_tokens": 1995,
+        "latency": 7.316035032272339,
+        "guardrail_interventions": 0
+      }
+    },
+    "guardrail_interventions": 0
+  },
+  "vector_db": {
+    "store_operations": 3,
+    "query_operations": 7,
+    "total_vectors_stored": 1,
+    "total_query_time": 21.33009171485901,
+    "total_store_time": 5.649679660797119,
+    "avg_query_time": 3.047155959265573,
+    "avg_store_time": 1.8832265535990398
+  },
+  "system": {
+    "start_memory": 321.73828125,
+    "peak_memory": 432.1640625,
+    "end_memory": 432.16796875,
+    "cpu_percent": 12.2
+  },
+  "errors": {
+    "total": 10,
+    "by_type": {
+      "cloudwatch_error": {
+        "count": 10,
+        "messages": [
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future."
+        ]
+      }
+    }
+  },
+  "costs": {
+    "llm": {
+      "total_cost": 0.011973,
+      "input_cost": 0.004488,
+      "output_cost": 0.0074849999999999995,
+      "total_cost_inr": 0.9997455,
+      "input_cost_inr": 0.37474799999999997,
+      "output_cost_inr": 0.6249975,
+      "by_model": {
+        "anthropic.claude-3-sonnet-20240229-v1:0": {
+          "calls": 1,
+          "input_tokens": 1496,
+          "output_tokens": 499,
+          "total_cost": 0.011973,
+          "input_cost": 0.004488,
+          "output_cost": 0.0074849999999999995,
+          "total_cost_inr": 0.9997455,
+          "input_cost_inr": 0.37474799999999997,
+          "output_cost_inr": 0.6249975
+        }
+      }
+    },
+    "total_estimated_cost": 0.011973,
+    "total_estimated_cost_inr": 0.9997455
+  }
+}

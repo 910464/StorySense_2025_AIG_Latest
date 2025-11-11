@@ -1,0 +1,37 @@
+text,User Story,AcceptanceCriteria,TestSteps,Expected Results
+BRLLR13-US001,Display of the CMP indicator on the Submission Summary Screen,"
+1. Given a user (Shared Services/Operations/UW Support) logs into DWF
+2. And create/opens a NB or renewal submission record from My List on the submission work queue (applicable for all products including NA AL/GL/WC, EU other products & NA FL)
+3. When user lands on Submission Summary screen
+4. Then system displays a Control Master Program field under the insured section on the submission screen 
+","1. Create Submission in Dashboard page
+2. Create New Submission in New Submission page
+3. Search a producer in new submission in Search Producer page
+4. Search Insured in new submission in Search Insured page
+5. Click new account button in Create New Account Warning page
+6. Create new account in Create New Account Page
+7. Fill Broker Contact in Broker Contact Page
+8. Validate if toggle field for 'Control Master Program' is available in 'Insured section' of Submission Finish and Close page
+9. Validate 'Control Master Program' toggle value is defaulted to 'No'.
+10. Change the toggle value for 'Control Master Program' to 'Yes'.
+11. Get Submission Number and click Finish and Close in Submission Finish and Close page
+12. Perform Advanced Search in My View Page
+13. Search Submission Number in Advanced Search page
+14. Click Continue in Underwriting Notification page
+15. Validate if toggle field for 'Control Master Program' is available in 'Account Summary' screen.
+16. Validate if toggle value for Control Master Program is 'Yes'.","User should be able to navigate to ‘Country – Business Unit – Division – UW’ screen.
+User should be able to provide value for Country, BU, Division & UW.
+On clicking Continue button in ‘Country – Business Unit – Division – UW’ screen, user should land on ‘Search Producer' screen followed by successfully performing producer search & selection operation.
+On clicking Continue button in ‘Search Producer' screen, user should land on ‘Search Insured' screen.
+User should be able to hit new account warning page button.
+User should be able to create new account.
+User should be able to fill broker contact in broker contact page.
+Toggle field for 'Control Master Program'  should be available in 'Insured section' of Submission Finish and Close page
+Default Toggle value for 'Control Master Program' should be 'No'.
+User should be able to change the toggle value for 'Control Master Program' to 'Yes'.
+User should be able to create submission without getting any error.
+User should be able to search  with the 'Submission'.
+User should be able to select the 'Submission' in UW Console after getting the search result.
+On clicking on Submission in UW Console, user should be able to land on 'UW Notification' screen and select continue button.
+In Account Summary, user should be able to validate if toggle field for Control Master Program is available.
+Toggle value for Control Master Program should be 'Yes'."

@@ -133,6 +133,27 @@ class StorySenseGenerator:
 
         print(Fore.CYAN + f"\nProcessing context library: {context_folder}" + Style.RESET_ALL)
 
+        # Show what files are available before processing
+        if os.path.exists(context_folder):
+            all_files = []
+            for root, dirs, files in os.walk(context_folder):
+                for file in files:
+                    if not file.startswith('.') and not file.startswith('~'):
+                        file_path = os.path.join(root, file)
+                        all_files.append(file_path)
+            
+            if all_files:
+                print(Fore.CYAN + f"📂 Scanning {len(all_files)} files in context library:" + Style.RESET_ALL)
+                for file_path in all_files:
+                    rel_path = os.path.relpath(file_path, context_folder)
+                    file_ext = os.path.splitext(file_path)[1].lower()
+                    file_size = os.path.getsize(file_path)
+                    print(f"  📄 {rel_path} [{file_ext}] ({file_size:,} bytes)")
+            else:
+                print(Fore.YELLOW + "📂 Context library directory is empty" + Style.RESET_ALL)
+        else:
+            print(Fore.YELLOW + f"📂 Context library directory does not exist: {context_folder}" + Style.RESET_ALL)
+
         # Create metrics manager
         metrics_manager = MetricsManager()
 
@@ -142,11 +163,21 @@ class StorySenseGenerator:
         # Process context files
         stats = processor.process_all_context_files(force_reprocess=force_reprocess)
 
-        # Display results
+        # Display detailed results
         if stats['processed_files'] > 0:
-            print(Fore.GREEN + f"\nProcessed {stats['processed_files']} context files successfully" + Style.RESET_ALL)
+            print(Fore.GREEN + f"\n✅ Successfully processed {stats['processed_files']} context files" + Style.RESET_ALL)
+            print(Fore.GREEN + f"📊 Created {stats['total_chunks']} total context chunks" + Style.RESET_ALL)
+            
+            # Show processing details by category
+            if stats.get('by_category'):
+                print(Fore.CYAN + "\n📊 Processing Summary by Category:" + Style.RESET_ALL)
+                for category, cat_stats in stats['by_category'].items():
+                    if cat_stats['total'] > 0:
+                        print(f"  • {category}: {cat_stats['processed']} processed, {cat_stats['skipped']} skipped, {cat_stats['failed']} failed")
         else:
             print(Fore.YELLOW + "\nNo new context files processed" + Style.RESET_ALL)
+            if stats.get('skipped_files', 0) > 0:
+                print(Fore.YELLOW + f"📊 {stats['skipped_files']} files were skipped (already processed)" + Style.RESET_ALL)
 
         return stats
 
@@ -223,7 +254,35 @@ class StorySenseGenerator:
                     stories_processed = True
                     return
 
-                # Try to read the file based on extension
+                # Check if it's a directory (means context has already been processed by process_context_library)
+                if os.path.isdir(self.additional_context_path):
+                    print(
+                        Fore.GREEN + f"\nProcessing with multi-file context from: {self.additional_context_path}\n" + Style.RESET_ALL)
+                    
+                    # Show what context files were found
+                    context_files = []
+                    for root, dirs, files in os.walk(self.additional_context_path):
+                        for file in files:
+                            if not file.startswith('.') and not file.startswith('~'):
+                                file_path = os.path.join(root, file)
+                                context_files.append(file_path)
+                    
+                    if context_files:
+                        print(Fore.CYAN + f"📁 Found {len(context_files)} context files:" + Style.RESET_ALL)
+                        for file_path in context_files:
+                            rel_path = os.path.relpath(file_path, self.additional_context_path)
+                            file_size = os.path.getsize(file_path)
+                            print(f"  📄 {rel_path} ({file_size:,} bytes)")
+                    else:
+                        print(Fore.YELLOW + "⚠️  No context files found in directory" + Style.RESET_ALL)
+                    
+                    # Context is already processed in the context library, just analyze with context
+                    story_sense_processor.analyze_stories_with_context_in_batches(input_us, None, self.output_file_path,
+                                                                                  batch_size, parallel)
+                    stories_processed = True
+                    return
+
+                # Try to read the file based on extension (single file legacy support)
                 file_ext = os.path.splitext(self.additional_context_path)[1].lower()
                 # Check if it's an image file
                 if file_ext in ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp']:

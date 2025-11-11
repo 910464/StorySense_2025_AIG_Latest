@@ -1,0 +1,80 @@
+{
+  "app": "StorySense",
+  "version": "1.0.0",
+  "start_time": "2025-11-11T15:53:58.499198",
+  "end_time": "2025-11-11T15:55:43.462665",
+  "total_duration": 104.96347498893738,
+  "user_stories": {
+    "BRLLR043-SC011": {
+      "processing_time": 47.95223355293274,
+      "context_count": 8,
+      "context_quality": "low",
+      "overall_score": 5.0
+    }
+  },
+  "batches": {
+    "1": {
+      "story_count": 1,
+      "processing_time": 49.95000720024109,
+      "stories_per_second": 0.020020017134155157
+    }
+  },
+  "llm": {
+    "total_calls": 0,
+    "total_tokens": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_latency": 0,
+    "avg_latency": 0,
+    "calls_by_type": {},
+    "guardrail_interventions": 0
+  },
+  "vector_db": {
+    "store_operations": 3,
+    "query_operations": 7,
+    "total_vectors_stored": 1,
+    "total_query_time": 21.775633573532104,
+    "total_store_time": 8.334678649902344,
+    "avg_query_time": 3.110804796218872,
+    "avg_store_time": 2.7782262166341147
+  },
+  "system": {
+    "start_memory": 195.578125,
+    "peak_memory": 396.1796875,
+    "end_memory": 396.19140625,
+    "cpu_percent": 8.4
+  },
+  "errors": {
+    "total": 10,
+    "by_type": {
+      "cloudwatch_error": {
+        "count": 10,
+        "messages": [
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future."
+        ]
+      }
+    }
+  },
+  "costs": {
+    "llm": {
+      "total_cost": 0,
+      "input_cost": 0,
+      "output_cost": 0,
+      "total_cost_inr": 0,
+      "input_cost_inr": 0,
+      "output_cost_inr": 0,
+      "by_model": {}
+    },
+    "total_estimated_cost": 0,
+    "total_estimated_cost_inr": 0
+  }
+}

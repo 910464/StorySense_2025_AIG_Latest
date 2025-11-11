@@ -1,0 +1,83 @@
+{
+    "recommendation": {
+        "recommended": "no",
+        "descriptionDiff": "Could not analyze: Unable to parse LLM response - no JSON found",
+        "acceptanceCriteriaDiff": "Could not analyze: Unable to parse LLM response - no JSON found",
+        "newUserStory": "Could not generate improved user story: Unable to parse LLM response - no JSON found"
+    },
+    "user_centered_score": 5,
+    "user_centered_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "user_centered_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "independent_score": 5,
+    "independent_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "independent_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "negotiable_score": 5,
+    "negotiable_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "negotiable_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "valuable_score": 5,
+    "valuable_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "valuable_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "estimable_score": 5,
+    "estimable_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "estimable_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "small_score": 5,
+    "small_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "small_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "testable_score": 5,
+    "testable_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "testable_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "acceptance_criteria_score": 5,
+    "acceptance_criteria_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "acceptance_criteria_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "prioritized_score": 5,
+    "prioritized_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "prioritized_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "collaboration_score": 5,
+    "collaboration_justification": "Could not analyze: Unable to parse LLM response - no JSON found",
+    "collaboration_recommendations": [
+        "Try again: Unable to parse LLM response - no JSON found"
+    ],
+    "key_insights": [
+        "Analysis failed: Unable to parse LLM response - no JSON found"
+    ],
+    "potential_risks": [
+        "Analysis failed: Unable to parse LLM response - no JSON found"
+    ],
+    "recommendations": [
+        "Try again or check the LLM configuration: Unable to parse LLM response - no JSON found"
+    ],
+    "context_analysis": {
+        "most_useful_file_types": [
+            "unknown"
+        ],
+        "context_quality_assessment": "Could not analyze context: Unable to parse LLM response - no JSON found"
+    },
+    "raw_llm_response": "Error: Unable to get multimodal response from LLM. Details: 'AWSBedrockConnector' object has no attribute 'generate_response_streaming'",
+    "us_id": "BRLLR043-SC011",
+    "userstory": "User Story Description:Displaying of warning message if default Billing Type Option is changed\nAcceptance Criteria : \nGIVEN an UW/UA/Ops/UW Support user has navigated to the Payment Plan Options screen of a new\nsubmission\nAND the system has automatically defaulted the Billing Type field\nWHEN the user clicks on the \u2018Billing Type\u2019 dropdown list\nAND selects an alternative option to that which was defaulted\nTHEN the system will display the warning message \u201cPlease validate that the billing option value selected\nis correct; changes beyond this stage will require a new policy number\u201d. (Wording To Be Confirmed)\nAND the \u2018Billing Type\u2019 field will be updated with the selected value",
+    "context_quality": "low",
+    "context_count": 8,
+    "context_file_types": {
+        "excel": 8
+    },
+    "processing_time": 9.369850158691406e-05,
+    "overall_score": 5.0
+}

@@ -41,8 +41,16 @@ class LLM:
         # self.config_parser_aws.read(os.path.join(self.config_path, 'ConfigAWS.properties'))
 
         # Get AWS Bedrock model ID from environment or config
-        self.MODEL_ID = os.getenv('LLM_MODEL_ID') 
-        self.MAX_TOKENS = os.getenv('LLM_MAX_TOKENS')
+        self.MODEL_ID = os.getenv('LLM_MODEL_ID') or 'anthropic.claude-3-sonnet-20240229-v1:0'
+        self.MAX_TOKENS = int(os.getenv('LLM_MAX_TOKENS', '200000'))
+
+        # Validate configuration
+        if not self.TEMPERATURE:
+            self.TEMPERATURE = 0.05
+        else:
+            self.TEMPERATURE = float(self.TEMPERATURE)
+
+        logging.info(f"LLM Configuration: Model={self.MODEL_ID}, Temp={self.TEMPERATURE}, MaxTokens={self.MAX_TOKENS}")
 
         # Initialize AWS Bedrock connector with metrics_manager
         self.aws_bedrock = AWSBedrockConnector(model_id=self.MODEL_ID, metrics_manager=self.metrics_manager)

@@ -1,0 +1,59 @@
+User Story ID: BRLLR043-SC011
+Processing Time: 20.02s
+Response Length: 1658
+--------------------------------------------------
+{
+    "recommendation": {
+        "recommended": "no",
+        "descriptionDiff": "N/A",
+        "acceptanceCriteriaDiff": "N/A",
+        "newUserStory": "N/A"
+    },
+    "user_centered_score": 10,
+    "user_centered_justification": "N/A",
+    "user_centered_recommendations": [],
+
+    "independent_score": 10,
+    "independent_justification": "N/A",
+    "independent_recommendations": [],
+
+    "negotiable_score": 10,
+    "negotiable_justification": "N/A",
+    "negotiable_recommendations": [],
+
+    "valuable_score": 10,
+    "valuable_justification": "N/A",
+    "valuable_recommendations": [],
+
+    "estimable_score": 10,
+    "estimable_justification": "N/A",
+    "estimable_recommendations": [],
+
+    "small_score": 10,
+    "small_justification": "N/A",
+    "small_recommendations": [],
+
+    "testable_score": 10,
+    "testable_justification": "N/A",
+    "testable_recommendations": [],
+
+    "acceptance_criteria_score": 10,
+    "acceptance_criteria_justification": "N/A",
+    "acceptance_criteria_recommendations": [],
+
+    "prioritized_score": 10,
+    "prioritized_justification": "N/A",
+    "prioritized_recommendations": [],
+
+    "collaboration_score": 10,
+    "collaboration_justification": "N/A",
+    "collaboration_recommendations": [],
+
+    "key_insights": ["The user story is well-written and meets all the quality criteria."],
+    "potential_risks": [],
+    "recommendations": [],
+    "context_analysis": {
+        "most_useful_file_types": ["Requirements documents", "User research reports", "Design mockups"],
+        "context_quality_assessment": "The provided context is sufficient to understand the user story and its requirements."
+    }
+}

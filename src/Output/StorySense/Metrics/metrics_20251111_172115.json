@@ -1,0 +1,98 @@
+{
+  "app": "StorySense",
+  "version": "1.0.0",
+  "start_time": "2025-11-11T17:19:09.222210",
+  "end_time": "2025-11-11T17:21:15.517070",
+  "total_duration": 126.2948944568634,
+  "user_stories": {
+    "BRLLR043-SC011": {
+      "processing_time": 82.54850506782532,
+      "context_count": 8,
+      "context_quality": "low",
+      "overall_score": 10.0
+    }
+  },
+  "batches": {
+    "1": {
+      "story_count": 1,
+      "processing_time": 82.84378266334534,
+      "stories_per_second": 0.012070911875954876
+    }
+  },
+  "llm": {
+    "total_calls": 1,
+    "total_tokens": 1992,
+    "input_tokens": 1496,
+    "output_tokens": 496,
+    "total_latency": 12.877111434936523,
+    "avg_latency": 12.877111434936523,
+    "calls_by_type": {
+      "analysis": {
+        "calls": 1,
+        "input_tokens": 1496,
+        "output_tokens": 496,
+        "total_tokens": 1992,
+        "latency": 12.877111434936523,
+        "guardrail_interventions": 0
+      }
+    },
+    "guardrail_interventions": 0
+  },
+  "vector_db": {
+    "store_operations": 1,
+    "query_operations": 6,
+    "total_vectors_stored": 0,
+    "total_query_time": 23.462864637374878,
+    "total_store_time": 0.9942412376403809,
+    "avg_query_time": 3.9104774395624795,
+    "avg_store_time": 0.9942412376403809
+  },
+  "system": {
+    "start_memory": 321.5859375,
+    "peak_memory": 421.6953125,
+    "end_memory": 421.73046875,
+    "cpu_percent": 80.4
+  },
+  "errors": {
+    "total": 7,
+    "by_type": {
+      "cloudwatch_error": {
+        "count": 7,
+        "messages": [
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future.",
+          "An error occurred (InvalidParameterValue) when calling the PutMetricData operation: The parameter MetricData.member.1.Timestamp must specify a time no more than two hours in the future."
+        ]
+      }
+    }
+  },
+  "costs": {
+    "llm": {
+      "total_cost": 0.011928,
+      "input_cost": 0.004488,
+      "output_cost": 0.0074399999999999996,
+      "total_cost_inr": 0.995988,
+      "input_cost_inr": 0.37474799999999997,
+      "output_cost_inr": 0.62124,
+      "by_model": {
+        "anthropic.claude-3-sonnet-20240229-v1:0": {
+          "calls": 1,
+          "input_tokens": 1496,
+          "output_tokens": 496,
+          "total_cost": 0.011928,
+          "input_cost": 0.004488,
+          "output_cost": 0.0074399999999999996,
+          "total_cost_inr": 0.995988,
+          "input_cost_inr": 0.37474799999999997,
+          "output_cost_inr": 0.62124
+        }
+      }
+    },
+    "total_estimated_cost": 0.011928,
+    "total_estimated_cost_inr": 0.995988
+  }
+}

@@ -143,12 +143,25 @@ class StorySenseAnalyzer:
 
         # Update how you format the context_prompt:
         if context:
+            # Log context usage for visibility
+            from colorama import Fore, Style
+            context_length = len(str(context))
+            print(f"{Fore.CYAN}🔍 Using context for story analysis:{Style.RESET_ALL}")
+            print(f"   📊 Context length: {context_length:,} characters")
+            
             # Format file type information
             file_type_summary = ""
             if context_file_types:
                 file_type_summary = "\nContext sources include:\n"
+                context_sources = []
                 for file_type, count in context_file_types.items():
                     file_type_summary += f"- {count} {file_type} document(s)\n"
+                    context_sources.append(f"{count} {file_type}")
+                print(f"   📁 Sources: {', '.join(context_sources)}")
+            
+            # Show a preview of the context content
+            context_preview = str(context)[:300] + "..." if len(str(context)) > 300 else str(context)
+            print(f"   📝 Context preview: {context_preview}")
 
             context_prompt = f"""
             ADDITIONAL CONTEXT:
@@ -163,13 +176,30 @@ class StorySenseAnalyzer:
             - Consider the reliability of different document types in your analysis
             """
         else:
+            from colorama import Fore, Style
+            print(f"{Fore.YELLOW}⚠️  No additional context available for this user story{Style.RESET_ALL}")
             context_prompt = "No additional context is available for this user story."
 
         # For AWS/Claude, add explicit JSON formatting instructions
         if self.llm_family == 'AWS':
             prompt_template += """
-            IMPORTANT: Format your response as valid JSON. Ensure all JSON keys and values are properly quoted.
-            Do not include any explanatory text outside the JSON structure.
+            CRITICAL FORMATTING REQUIREMENTS:
+            1. Your response MUST be valid JSON only - no explanatory text, no markdown formatting, no code blocks
+            2. Start your response immediately with the opening curly brace {
+            3. End your response with the closing curly brace }
+            4. Ensure all JSON keys and string values are properly quoted with double quotes
+            5. Use only double quotes, never single quotes
+            6. Do not include any text before or after the JSON object
+            7. If you need to include quotes within string values, escape them with backslashes
+            
+            Example of correct format:
+            {"key": "value", "score": 5, "list": ["item1", "item2"]}
+            
+            Example of INCORRECT format:
+            Here's the analysis: {"key": "value"}
+            ```json
+            {"key": "value"}
+            ```
             """
 
         # Send request to LLM
@@ -187,38 +217,43 @@ class StorySenseAnalyzer:
 
         # Call LLM with call_type for metrics tracking
         response = self.llm.send_request_multimodal(prompt_template,image_path="", call_type="analysis")
-
+        
+        # Enhanced logging for debugging
+        logging.info(f"Received response from LLM: {len(response)} characters")
+        logging.info(f"Response preview (first 500 chars): {response[:500]}")
+        logging.info(f"Response ending (last 200 chars): {response[-200:]}")
+        logging.info(f"Contains opening brace: {'{' in response}")
+        logging.info(f"Contains closing brace: {'}' in response}")
+        logging.info(f"Contains 'json': {'json' in response.lower()}")
+        
         # Calculate processing time
         processing_time = time.time() - start_time
         logging.info(f"Received response from LLM for user story {us_id} in {processing_time:.2f}s")
-
-        # Parse JSON response
+        
+        # Also save the raw response to a file for debugging
+        debug_file = f"../Output/debug_response_{us_id}_{int(time.time())}.txt"
         try:
-            # Find JSON content in the response
-            json_start = response.find('{')
-            json_end = response.rfind('}') + 1
+            with open(debug_file, 'w', encoding='utf-8') as f:
+                f.write(f"User Story ID: {us_id}\n")
+                f.write(f"Processing Time: {processing_time:.2f}s\n")
+                f.write(f"Response Length: {len(response)}\n")
+                f.write("-" * 50 + "\n")
+                f.write(response)
+            logging.info(f"Saved raw response to {debug_file}")
+        except Exception as e:
+            logging.warning(f"Could not save debug file: {e}")
 
-            if json_start >= 0 and json_end > json_start:
-                json_content = response[json_start:json_end]
-
-                # Clean up any potential issues with the JSON for Claude responses
-                if self.llm_family == 'AWS':
-                    # Replace any triple backticks that Claude might add
-                    if '```json' in json_content:
-                        json_content = json_content.split('```json')[1].split('```')[0].strip()
-                    # Clean up newlines and tabs that might cause JSON parsing issues
-                    json_content = json_content.replace('\n', ' ').replace('\t', ' ')
-
-                try:
-                    analysis = json.loads(json_content)
-                except json.JSONDecodeError as e:
-                    logging.error(f"JSON decode error: {e}")
-                    logging.error(f"JSON content: {json_content}")
-                    analysis = self._create_fallback_analysis(f"JSON parsing error: {str(e)}")
-            else:
-                # Fallback if JSON parsing fails
-                logging.error(f"Could not find JSON content in response: {response[:200]}...")
-                analysis = self._create_fallback_analysis("Unable to parse LLM response - no JSON found")
+        # Parse JSON response with improved error handling
+        try:
+            analysis = self._extract_and_parse_json(response)
+            
+            # If extraction failed, try a simplified prompt
+            if (isinstance(analysis, dict) and 
+                analysis.get('user_centered_justification', '').startswith('Could not analyze')):
+                
+                logging.warning("Complex prompt failed, trying simplified approach")
+                analysis = self._try_simplified_analysis(user_story_data)
+                
         except Exception as e:
             logging.error(f"Error parsing LLM response: {str(e)}")
             analysis = self._create_fallback_analysis(f"Error parsing response: {str(e)}")
@@ -257,6 +292,249 @@ class StorySenseAnalyzer:
 
         logging.info(f"Analysis completed for user story {us_id} with overall score {analysis['overall_score']}")
         return analysis
+
+    def _extract_and_parse_json(self, response):
+        """
+        Extract and parse JSON from LLM response with multiple fallback strategies
+        """
+        # Strategy 1: Look for JSON blocks marked with ```json
+        if '```json' in response:
+            try:
+                json_content = response.split('```json')[1].split('```')[0].strip()
+                logging.info("Found JSON content in markdown code block")
+                return json.loads(json_content)
+            except (json.JSONDecodeError, IndexError) as e:
+                logging.warning(f"Failed to parse JSON from markdown block: {e}")
+
+        # Strategy 2: Look for JSON blocks marked with ``` 
+        if '```' in response and '{' in response:
+            try:
+                # Find content between triple backticks that contains JSON
+                blocks = response.split('```')
+                for block in blocks:
+                    block = block.strip()
+                    if block.startswith('{') and block.endswith('}'):
+                        logging.info("Found JSON content in generic code block")
+                        return json.loads(block)
+            except json.JSONDecodeError as e:
+                logging.warning(f"Failed to parse JSON from code block: {e}")
+
+        # Strategy 3: Find the largest JSON object in the response
+        json_start = response.find('{')
+        if json_start >= 0:
+            # Find the matching closing brace
+            brace_count = 0
+            json_end = json_start
+            for i, char in enumerate(response[json_start:], json_start):
+                if char == '{':
+                    brace_count += 1
+                elif char == '}':
+                    brace_count -= 1
+                    if brace_count == 0:
+                        json_end = i + 1
+                        break
+            
+            if json_end > json_start:
+                try:
+                    json_content = response[json_start:json_end]
+                    logging.info("Found JSON content using brace matching")
+                    return json.loads(json_content)
+                except json.JSONDecodeError as e:
+                    logging.warning(f"Failed to parse JSON using brace matching: {e}")
+
+        # Strategy 4: Clean up response and try parsing the whole thing
+        try:
+            # Remove any leading/trailing non-JSON content
+            cleaned_response = response.strip()
+            
+            # Remove common prefixes that Claude might add
+            prefixes_to_remove = [
+                "Here's the analysis:",
+                "Here is the analysis:",
+                "Analysis:",
+                "```json",
+                "```"
+            ]
+            
+            for prefix in prefixes_to_remove:
+                if cleaned_response.startswith(prefix):
+                    cleaned_response = cleaned_response[len(prefix):].strip()
+            
+            # Remove common suffixes
+            suffixes_to_remove = ["```"]
+            for suffix in suffixes_to_remove:
+                if cleaned_response.endswith(suffix):
+                    cleaned_response = cleaned_response[:-len(suffix)].strip()
+            
+            # Try to parse the cleaned response
+            if cleaned_response.startswith('{') and cleaned_response.endswith('}'):
+                logging.info("Attempting to parse cleaned response as JSON")
+                return json.loads(cleaned_response)
+        
+        except json.JSONDecodeError as e:
+            logging.warning(f"Failed to parse cleaned response: {e}")
+
+        # Strategy 5: Extract JSON-like content using regex
+        import re
+        try:
+            # Look for patterns that look like JSON objects
+            json_pattern = r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}'
+            matches = re.findall(json_pattern, response, re.DOTALL)
+            
+            for match in matches:
+                try:
+                    parsed = json.loads(match)
+                    # Check if this looks like our expected structure
+                    if isinstance(parsed, dict) and 'user_centered_score' in parsed:
+                        logging.info("Found valid JSON using regex pattern matching")
+                        return parsed
+                except json.JSONDecodeError:
+                    continue
+        
+        except Exception as e:
+            logging.warning(f"Regex extraction failed: {e}")
+
+        # Strategy 6: If response indicates an error, try to regenerate with simpler prompt
+        if any(error_indicator in response.lower() for error_indicator in ['error', 'unable', 'cannot', 'failed', 'sorry']):
+            logging.warning("Response contains error indicators, attempting simplified analysis")
+            return self._generate_simple_analysis(response)
+        
+        # Strategy 7: Last resort - create a JSON-like structure from any scoring information found
+        if any(word in response.lower() for word in ['score', 'rating', 'analysis', 'recommendation']):
+            logging.warning("Attempting to extract partial analysis from response")
+            return self._extract_partial_analysis(response)
+        
+        # If all strategies fail, log the response and create fallback
+        logging.error("All JSON extraction strategies failed")
+        logging.error(f"Raw response (first 500 chars): {response[:500]}")
+        logging.error(f"Raw response (last 200 chars): {response[-200:]}")
+        logging.error(f"Response contains curly braces: {'{' in response and '}' in response}")
+        logging.error(f"Response contains 'json': {'json' in response.lower()}")
+        logging.error(f"Response type: {type(response)}")
+        logging.error(f"Response is empty: {len(response.strip()) == 0}")
+        
+        return self._create_fallback_analysis(f"Unable to parse LLM response - all JSON extraction strategies failed. Response length: {len(response)}")
+
+    def _generate_simple_analysis(self, error_response):
+        """Generate a simple analysis when the LLM returns an error"""
+        logging.info("Generating simple analysis due to LLM error response")
+        
+        reason = "LLM returned an error response"
+        if "error" in error_response.lower():
+            reason = "LLM error: " + error_response[:200]
+        
+        return self._create_fallback_analysis(reason)
+
+    def _extract_partial_analysis(self, response):
+        """Try to extract any scoring or analysis information from a non-JSON response"""
+        import re
+        
+        logging.info("Attempting to extract partial analysis from non-JSON response")
+        
+        # Try to find numerical scores in the response
+        score_patterns = [
+            r'(\w+).*?score.*?(\d+)',
+            r'score.*?(\w+).*?(\d+)',
+            r'(\w+).*?(\d+)\/10',
+            r'(\d+).*?(\w+)',
+        ]
+        
+        extracted_scores = {}
+        score_fields = [
+            'user_centered', 'independent', 'negotiable', 'valuable', 
+            'estimable', 'small', 'testable', 'acceptance_criteria', 
+            'prioritized', 'collaboration'
+        ]
+        
+        for pattern in score_patterns:
+            matches = re.findall(pattern, response, re.IGNORECASE)
+            for match in matches:
+                if len(match) == 2:
+                    word, score = match
+                    try:
+                        score_val = int(score)
+                        if 1 <= score_val <= 10:
+                            for field in score_fields:
+                                if field.lower() in word.lower() or word.lower() in field.lower():
+                                    extracted_scores[f"{field}_score"] = score_val
+                                    break
+                    except ValueError:
+                        continue
+        
+        if extracted_scores:
+            logging.info(f"Extracted scores: {extracted_scores}")
+            analysis = self._create_fallback_analysis("Partial analysis extracted from non-JSON response")
+            analysis.update(extracted_scores)
+            return analysis
+        
+        return self._create_fallback_analysis("Could not extract any scoring information from response")
+
+    def _try_simplified_analysis(self, user_story_data):
+        """Try a much simpler prompt if the complex one fails"""
+        
+        us_id = user_story_data["us_id"]
+        userstory = user_story_data["userstory"]
+        
+        simple_prompt = f"""
+        Analyze this user story and respond with ONLY valid JSON. No other text.
+
+        User Story: {userstory}
+
+        Respond with exactly this JSON structure:
+        {{
+            "user_centered_score": 5,
+            "independent_score": 5,
+            "negotiable_score": 5,
+            "valuable_score": 5,
+            "estimable_score": 5,
+            "small_score": 5,
+            "testable_score": 5,
+            "acceptance_criteria_score": 5,
+            "prioritized_score": 5,
+            "collaboration_score": 5,
+            "recommendation": {{
+                "recommended": "no",
+                "descriptionDiff": "No changes needed",
+                "acceptanceCriteriaDiff": "No changes needed", 
+                "newUserStory": "{userstory}"
+            }}
+        }}
+        
+        Replace the scores (1-10) based on your analysis. Start response with {{ and end with }}.
+        """
+        
+        try:
+            logging.info(f"Trying simplified analysis for user story {us_id}")
+            response = self.llm.send_request_multimodal(simple_prompt, image_path="", call_type="simplified_analysis")
+            
+            logging.info(f"Simplified response length: {len(response)}")
+            logging.info(f"Simplified response preview: {response[:200]}")
+            
+            # Try to parse the simplified response
+            analysis = self._extract_and_parse_json(response)
+            
+            if isinstance(analysis, dict) and 'user_centered_score' in analysis:
+                logging.info("Simplified analysis succeeded!")
+                
+                # Add the missing fields
+                analysis["us_id"] = us_id
+                analysis["userstory"] = userstory
+                analysis["context_quality"] = user_story_data.get("context_quality", "none")
+                analysis["context_count"] = user_story_data.get("context_count", 0)
+                analysis["context_file_types"] = user_story_data.get("context_file_types", {})
+                analysis["processing_time"] = 0
+                
+                # Ensure all required fields
+                self._ensure_required_fields(analysis)
+                
+                return analysis
+            else:
+                logging.warning("Simplified analysis also failed")
+                return self._create_fallback_analysis("Both complex and simplified analysis failed")
+                
+        except Exception as e:
+            logging.error(f"Simplified analysis error: {e}")
+            return self._create_fallback_analysis(f"Simplified analysis error: {str(e)}")
 
     def _create_fallback_analysis(self, reason):
         """Create a fallback analysis when parsing fails"""

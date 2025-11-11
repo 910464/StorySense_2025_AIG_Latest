@@ -10,14 +10,10 @@ import traceback
 import base64
 from PIL import Image
 import io
-
 from src.context_handler.context_storage_handler.pgvector_connector import PGVectorConnector
 # from src.configuration_handler.env_manager import EnvManager
 from src.metrics.metrics_manager import MetricsManager
 from src.aws_layer.circuit_breaker import CircuitBreaker
-
-
-
 
 class AWSBedrockConnector:
     def __init__(self, model_id=None, metrics_manager=None):
@@ -38,7 +34,10 @@ class AWSBedrockConnector:
         self.circuit_breaker = CircuitBreaker(name="bedrock", failure_threshold=3, reset_timeout=30)
 
         # Get model ID from environment or parameter
-        self.model_id = os.getenv('MODEL_ID', 'anthropic.claude-3-sonnet-20240229-v1:0')
+        self.model_id = os.getenv('LLM_MODEL_ID') or os.getenv('MODEL_ID', 'anthropic.claude-3-sonnet-20240229-v1:0')
+        
+        # Initialize guardrails configuration
+        self.use_guardrails = False  # Default to False since guardrails aren't always needed
 
         # Initialize AWS session with region from environment
         region_name = os.getenv('AWS_REGION', 'us-east-1')
@@ -140,6 +139,7 @@ class AWSBedrockConnector:
             # Fallback to original encoding if resizing fails
             with open(image_path, "rb") as image_file:
                 return base64.b64encode(image_file.read()).decode('utf-8'), f"image/{img.format.lower()}"
+
     def generate_response_multimodal(self, prompt, image_path, temperature, max_tokens, call_type):
         """
         Generate a response from a multimodal model on AWS Bedrock.
@@ -148,9 +148,8 @@ class AWSBedrockConnector:
         if not image_path:
             # If no image is provided, use the text-based generation
             logging.info("No image provided, falling back to text generation.")
-            # The streaming function is a generator, so we need to consume it.
-            response_generator = self.generate_response_streaming(prompt, temperature, max_tokens, call_type)
-            return "".join([chunk for chunk in response_generator])
+            # Use the regular generate_response method for text-only requests
+            return self.generate_response(prompt, temperature, max_tokens, call_type)
 
         start_time = time.time()
         try:
@@ -201,6 +200,11 @@ class AWSBedrockConnector:
             input_tokens = response_body.get('usage', {}).get('input_tokens', 0)
             output_tokens = response_body.get('usage', {}).get('output_tokens', 0)
 
+            # Debug logging for multimodal response
+            logging.info(f"Bedrock multimodal response length: {len(output_text)}")
+            logging.info(f"Response starts with: {output_text[:100]}...")
+            logging.info(f"Response ends with: {output_text[-100:]}")
+
             # Record metrics
             self.metrics_manager.record_llm_call(
                 call_type=call_type,
@@ -222,6 +226,7 @@ class AWSBedrockConnector:
                 guardrail_triggered=False # Assuming no guardrail for multimodal
             )
             logging.error(f"Error generating multimodal response: {e}")
+            logging.error(f"Full error details: {traceback.format_exc()}")
             return f"Error: {e}"
 
     def count_tokens(self, text):
@@ -229,10 +234,11 @@ class AWSBedrockConnector:
         if not text:
             return 0
 
-        if self.has_tokenizer:
+        # Check if we have a tokenizer (this attribute may not exist)
+        if hasattr(self, 'has_tokenizer') and self.has_tokenizer:
             return len(self.tokenizer.encode(text))
         else:
-            # Rough estimation (4 chars ≈ 1 token)
+            # Rough estimation (4 chars ≈ 1 token for most models)
             return len(text) // 4
 
     def generate_response(self, prompt, temperature=None, max_tokens=None, call_type="default"):
@@ -283,7 +289,7 @@ class AWSBedrockConnector:
                 }
 
                 # Apply guardrails if configured
-                if self.use_guardrails:
+                if hasattr(self, 'use_guardrails') and self.use_guardrails:
                     # guardrail_config = os.get('default', {})
                     guardrail_id = os.getenv('guardrail_id')
                     guardrail_region = os.getenv('region')
@@ -323,12 +329,28 @@ class AWSBedrockConnector:
                         logging.warning(f"Guardrail triggered with action: {action}")
                         guardrail_triggered = True
 
-                # Extract text from response
+                # Extract text from response with better error handling
                 result = ""
                 if 'content' in response_body and len(response_body['content']) > 0:
                     for content_block in response_body['content']:
                         if content_block.get('type') == 'text':
-                            result += content_block.get('text')
+                            result += content_block.get('text', '')
+                else:
+                    # Fallback: try to get text from different response formats
+                    if 'completion' in response_body:
+                        result = response_body['completion']
+                    elif 'text' in response_body:
+                        result = response_body['text']
+                    elif isinstance(response_body, str):
+                        result = response_body
+                    else:
+                        logging.warning(f"Unexpected response format: {list(response_body.keys())}")
+                        result = json.dumps(response_body)
+
+                # Log the extracted result for debugging
+                logging.info(f"Extracted result length: {len(result)}")
+                if len(result) == 0:
+                    logging.error(f"Empty result from response_body: {response_body}")
 
                 # Extract token usage from response
                 actual_input_tokens = input_tokens  # Use our calculated input tokens
@@ -379,11 +401,11 @@ class AWSBedrockConnector:
             logging.error(f"Error generating response from AWS Bedrock: {str(e)}")
             return f"Error: {str(e)}"
 
-    # def _truncate_prompt(self, prompt, max_length=200000):
-    #     """
-    #     Truncates the prompt if it's too long.
-    #     """
-    #     if len(prompt) > max_length:
-    #         logging.warning(f"Prompt is too long ({len(prompt)} chars). Truncating to {max_length} chars.")
-    #         return prompt[:max_length] + "\n\n[PROMPT TRUNCATED]"
-    #     return prompt
+    def _truncate_prompt(self, prompt, max_length=200000):
+        """
+        Truncates the prompt if it's too long.
+        """
+        if len(prompt) > max_length:
+            logging.warning(f"Prompt is too long ({len(prompt)} chars). Truncating to {max_length} chars.")
+            return prompt[:max_length] + "\n\n[PROMPT TRUNCATED]"
+        return prompt

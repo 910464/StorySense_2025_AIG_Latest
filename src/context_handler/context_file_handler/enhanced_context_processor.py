@@ -489,7 +489,7 @@ class EnhancedContextProcessor:
 
             # OCR text extraction (if enabled)
             ocr_text = ""
-            if self.env_manager.get_env('OCR_ENABLED', 'false').lower() == 'true':
+            if os.getenv('OCR_ENABLED', 'false').lower() == 'true':
                 ocr_text = self._extract_text_from_image(file_path)
 
             # Create content
