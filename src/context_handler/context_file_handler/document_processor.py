@@ -140,6 +140,9 @@ class DocumentProcessor:
         return documents
 
     def _process_excel(self, file_path: str) -> List[Dict[str, Any]]:
+        if not HAS_DOC_PROCESSORS:
+            raise ImportError("openpyxl not installed")
+
         documents = []
 
         try:

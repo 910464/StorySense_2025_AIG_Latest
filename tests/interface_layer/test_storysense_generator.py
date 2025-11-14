@@ -11,17 +11,34 @@ import shutil
 
 @pytest.fixture(autouse=True)
 def setup_test_environment():
-    """Setup test environment before each test"""
-    # Mock the main_service_router
-    from fastapi import APIRouter
-    mock_router = APIRouter(tags=["StorySense Generator"])
-    sys.modules['main_service_router'] = Mock(story_sense_router=mock_router)
+    """Setup test environment and mock all dependencies before each test"""
+    # Mock all problematic modules that cause import errors
+    mock_modules = {
+        'main_service_router': Mock(story_sense_router=Mock()),
+        'src.aws_layer.aws_titan_embedding': Mock(AWSTitanEmbeddings=Mock()),
+        'src.metrics.metrics_manager': Mock(MetricsManager=Mock()),
+        'src.html_report.storysense_processor': Mock(StorySenseProcessor=Mock()),
+        'src.context_handler.context_file_handler.enhanced_context_processor': Mock(EnhancedContextProcessor=Mock()),
+        'src.prompt_layer.storysense_analyzer': Mock(StorySenseAnalyzer=Mock()),
+        'src.llm_layer.model_manual_test_llm': Mock(LLM=Mock()),
+        'langchain.prompts.prompt': Mock(PromptTemplate=Mock()),
+        'langchain_core.prompts.prompt': Mock(PromptTemplate=Mock()),
+        'transformers': Mock(),
+        'torch': Mock(),
+        'botocore': Mock(args=Mock()),
+        'colorama': Mock(Fore=Mock(GREEN='', CYAN='', RESET=''), Style=Mock(RESET_ALL='')),
+    }
+    
+    # Add all mock modules to sys.modules
+    for module_name, mock_module in mock_modules.items():
+        sys.modules[module_name] = mock_module
 
     yield
 
-    # Cleanup
-    if 'main_service_router' in sys.modules:
-        del sys.modules['main_service_router']
+    # Cleanup - remove mocked modules
+    for module_name in mock_modules.keys():
+        if module_name in sys.modules:
+            del sys.modules[module_name]
 
 
 @pytest.fixture
@@ -64,11 +81,22 @@ class TestStorySenseGeneratorInitialization:
 
     @patch('os.makedirs')
     @patch('os.path.exists')
+    @patch('os.path.isabs')
+    @patch('os.path.abspath')
+    @patch('os.path.basename')
     @patch('builtins.open', new_callable=mock_open,
            read_data="[Input]\ninput_file_path=../Input/UserStories.xlsx\nadditional_context_path=../Input/AdditionalContext.xlsx\n[Output]\noutput_file_path=../Output/StorySense\n[LLM]\nLLM_FAMILY=AWS\n")
-    def test_initialization_with_defaults(self, mock_file, mock_exists, mock_makedirs):
+    def test_initialization_with_defaults(self, mock_file, mock_basename, mock_abspath, mock_isabs, mock_exists, mock_makedirs):
         """Test initialization with default parameters"""
         mock_exists.return_value = True
+        mock_isabs.return_value = False  # Paths are relative
+        mock_abspath.side_effect = lambda x: f"/absolute{x}"
+        mock_basename.side_effect = lambda x: os.path.basename(x)
+
+        # Clear any existing modules from sys.modules that might cause conflicts
+        modules_to_clear = [name for name in sys.modules.keys() if 'StorySenseGenerator' in name]
+        for module in modules_to_clear:
+            del sys.modules[module]
 
         from src.interface_layer.StorySenseGenerator import StorySenseGenerator
 

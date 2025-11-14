@@ -8,7 +8,7 @@ from src.context_handler.context_storage_handler.db_config_loader import DBConfi
 
 class TestDBConfigLoader:
     @pytest.fixture
-    def metrics_manager_mock(self):
+    def global_metrics_manager_mock(self):
         """Mock metrics manager for testing"""
         mock = Mock()
         mock.record_error = Mock()
@@ -38,7 +38,7 @@ class TestDBConfigLoader:
 
         return str(config_file)
 
-    def test_initialization_with_defaults(self, metrics_manager_mock, aws_titan_embeddings_mock):
+    def test_initialization_with_defaults(self, global_metrics_manager_mock, aws_titan_embeddings_mock):
         """Test initialization with default values"""
         # Arrange
         # Mock os.getenv to return the default values that are hardcoded in the class
@@ -53,7 +53,7 @@ class TestDBConfigLoader:
             mock_getenv.side_effect = mock_getenv_side_effect
 
             # Act
-            loader = DBConfigLoader(metrics_manager=metrics_manager_mock)
+            loader = DBConfigLoader(metrics_manager=global_metrics_manager_mock)
 
             # Assert
             # Check that the model_id is set from the environment variable
@@ -61,7 +61,7 @@ class TestDBConfigLoader:
             assert loader.local_storage_path == os.getenv('LOCAL_EMBEDDINGS_PATH', '../Data/LocalEmbeddings')
             aws_titan_embeddings_mock.assert_called_once()
 
-    def test_initialization_with_env_variables(self, metrics_manager_mock, aws_titan_embeddings_mock):
+    def test_initialization_with_env_variables(self, global_metrics_manager_mock, aws_titan_embeddings_mock):
         """Test initialization with environment variables"""
         # Arrange
         # Mock the environment variables
@@ -84,7 +84,7 @@ class TestDBConfigLoader:
             mock_getenv.side_effect = mock_getenv_side_effect
 
             # Act
-            loader = DBConfigLoader(metrics_manager=metrics_manager_mock)
+            loader = DBConfigLoader(metrics_manager=global_metrics_manager_mock)
 
             # Assert
             assert loader.similarity_metric == 'l2'
@@ -101,7 +101,7 @@ class TestDBConfigLoader:
             # Check that AWSTitanEmbeddings was initialized with correct parameters
             aws_titan_embeddings_mock.assert_called_once()
 
-    def test_load_config_with_exception(self, metrics_manager_mock, aws_titan_embeddings_mock):
+    def test_load_config_with_exception(self, global_metrics_manager_mock, aws_titan_embeddings_mock):
         """Test error handling during configuration loading"""
         # Arrange
         with patch('os.getenv') as mock_getenv:
@@ -120,12 +120,12 @@ class TestDBConfigLoader:
             # Act & Assert
             # The exception should be caught, logged, and re-raised
             with pytest.raises(Exception, match="Test error"):
-                loader = DBConfigLoader(metrics_manager=metrics_manager_mock)
+                loader = DBConfigLoader(metrics_manager=global_metrics_manager_mock)
 
             # Verify that the error was recorded before re-raising
-            metrics_manager_mock.record_error.assert_called_once_with('config_error', 'Test error')
+            global_metrics_manager_mock.record_error.assert_called_once_with('config_error', 'Test error')
 
-    def test_load_config_with_custom_config_path(self, metrics_manager_mock, aws_titan_embeddings_mock,
+    def test_load_config_with_custom_config_path(self, global_metrics_manager_mock, aws_titan_embeddings_mock,
                                                  config_file_mock):
         """Test loading configuration from a custom config file path"""
         # Arrange
@@ -140,7 +140,7 @@ class TestDBConfigLoader:
             mock_getenv.side_effect = mock_getenv_side_effect
 
             # Act
-            loader = DBConfigLoader(config_file_path=config_file_mock, metrics_manager=metrics_manager_mock)
+            loader = DBConfigLoader(config_file_path=config_file_mock, metrics_manager=global_metrics_manager_mock)
 
             # Assert
             aws_titan_embeddings_mock.assert_called_once()
@@ -148,7 +148,7 @@ class TestDBConfigLoader:
             assert loader.model_id == 'amazon.titan-embed-text-v1'
             assert loader.local_storage_path == '../Data/LocalEmbeddings'
 
-    def test_load_config_with_missing_config_file(self, metrics_manager_mock, aws_titan_embeddings_mock):
+    def test_load_config_with_missing_config_file(self, global_metrics_manager_mock, aws_titan_embeddings_mock):
         """Test loading configuration with a missing config file"""
         # Arrange
         with patch('os.getenv') as mock_getenv:
@@ -163,7 +163,7 @@ class TestDBConfigLoader:
 
             # Act
             loader = DBConfigLoader(config_file_path="/nonexistent/path/config.properties",
-                                    metrics_manager=metrics_manager_mock)
+                                    metrics_manager=global_metrics_manager_mock)
 
             # Assert
             # Should use values from environment variables
@@ -171,7 +171,7 @@ class TestDBConfigLoader:
             assert loader.local_storage_path == '../Data/LocalEmbeddings'
             aws_titan_embeddings_mock.assert_called_once()
 
-    def test_load_config_with_partial_env_variables(self, metrics_manager_mock, aws_titan_embeddings_mock):
+    def test_load_config_with_partial_env_variables(self, global_metrics_manager_mock, aws_titan_embeddings_mock):
         """Test loading configuration with partial environment variables"""
         # Arrange
         with patch('os.getenv') as mock_getenv:
@@ -187,7 +187,7 @@ class TestDBConfigLoader:
             mock_getenv.side_effect = mock_getenv_side_effect
 
             # Act
-            loader = DBConfigLoader(metrics_manager=metrics_manager_mock)
+            loader = DBConfigLoader(metrics_manager=global_metrics_manager_mock)
 
             # Assert
             assert loader.db_host == 'test-host'
@@ -198,7 +198,7 @@ class TestDBConfigLoader:
             assert loader.db_password is None
             assert loader.ssl_mode is None
 
-    def test_load_config_with_empty_env_variables(self, metrics_manager_mock, aws_titan_embeddings_mock):
+    def test_load_config_with_empty_env_variables(self, global_metrics_manager_mock, aws_titan_embeddings_mock):
         """Test loading configuration with empty environment variables"""
         # Arrange
         with patch('os.getenv') as mock_getenv:
@@ -220,7 +220,7 @@ class TestDBConfigLoader:
             mock_getenv.side_effect = mock_getenv_side_effect
 
             # Act
-            loader = DBConfigLoader(metrics_manager=metrics_manager_mock)
+            loader = DBConfigLoader(metrics_manager=global_metrics_manager_mock)
 
             # Assert
             # Should use empty values from environment
@@ -235,7 +235,7 @@ class TestDBConfigLoader:
             assert loader.model_name == ''
             assert loader.local_storage_path == ''
 
-    def test_load_config_with_invalid_env_variables(self, metrics_manager_mock, aws_titan_embeddings_mock):
+    def test_load_config_with_invalid_env_variables(self, global_metrics_manager_mock, aws_titan_embeddings_mock):
         """Test loading configuration with invalid environment variables"""
         # Arrange
         with patch('os.getenv') as mock_getenv:
@@ -251,14 +251,14 @@ class TestDBConfigLoader:
             mock_getenv.side_effect = mock_getenv_side_effect
 
             # Act
-            loader = DBConfigLoader(metrics_manager=metrics_manager_mock)
+            loader = DBConfigLoader(metrics_manager=global_metrics_manager_mock)
 
             # Assert
             # Should use the invalid values as strings
             assert loader.db_port == 'not-a-number'
             assert loader.threshold == 'not-a-number'
 
-    def test_embeddings_initialization(self, metrics_manager_mock):
+    def test_embeddings_initialization(self, global_metrics_manager_mock):
         """Test that embeddings are properly initialized"""
         # Arrange
         with patch('src.aws_layer.aws_titan_embedding.AWSTitanEmbeddings') as mock_embeddings:
@@ -277,7 +277,7 @@ class TestDBConfigLoader:
 
                 mock_getenv.side_effect = mock_getenv_side_effect
 
-                loader = DBConfigLoader(metrics_manager=metrics_manager_mock)
+                loader = DBConfigLoader(metrics_manager=global_metrics_manager_mock)
 
             # Assert
             assert loader.embeddings is mock_instance

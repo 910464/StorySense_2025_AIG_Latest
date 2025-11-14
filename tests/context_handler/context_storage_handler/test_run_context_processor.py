@@ -23,7 +23,7 @@ class TestEnhancedContextProcessor:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
     @pytest.fixture
-    def processor(self, temp_context_dir, metrics_manager_mock):
+    def processor(self, temp_context_dir, global_metrics_manager_mock):
         """Create an EnhancedContextProcessor instance for testing"""
         with patch(
                 'src.context_handler.context_storage_handler.run_context_processor.PGVectorConnector') as mock_pgvector, \
@@ -37,7 +37,7 @@ class TestEnhancedContextProcessor:
             mock_embeddings.return_value = Mock()
             mock_image_parser.return_value = Mock()
 
-            processor = EnhancedContextProcessor(temp_context_dir, metrics_manager=metrics_manager_mock)
+            processor = EnhancedContextProcessor(temp_context_dir, metrics_manager=global_metrics_manager_mock)
             processor.image_parser = Mock()
             processor.image_parser.parse_image.return_value = "Extracted text from image"
 
@@ -81,12 +81,12 @@ class TestEnhancedContextProcessor:
         assert 'business_rules' in processor.context_collections
         assert 'wireframes' in processor.context_collections
 
-    def test_initialization_creates_directories(self, temp_context_dir, metrics_manager_mock):
+    def test_initialization_creates_directories(self, temp_context_dir, global_metrics_manager_mock):
         """Test that initialization creates necessary directories"""
         with patch('src.context_handler.context_storage_handler.run_context_processor.PGVectorConnector'), \
                 patch('src.context_handler.context_storage_handler.run_context_processor.AWSTitanEmbeddings'), \
                 patch('src.context_handler.context_storage_handler.run_context_processor.ImageParserLLM'):
-            processor = EnhancedContextProcessor(temp_context_dir, metrics_manager=metrics_manager_mock)
+            processor = EnhancedContextProcessor(temp_context_dir, metrics_manager=global_metrics_manager_mock)
 
             assert os.path.exists(processor.output_dir)
 
@@ -564,12 +564,12 @@ class TestEnhancedContextProcessor:
             assert 'processed_files' in stats
             assert 'processing_time' in stats
 
-    def test_process_all_context_files_nonexistent_folder(self, metrics_manager_mock):
+    def test_process_all_context_files_nonexistent_folder(self, global_metrics_manager_mock):
         """Test processing with nonexistent folder"""
         with patch('src.context_handler.context_storage_handler.run_context_processor.PGVectorConnector'), \
                 patch('src.context_handler.context_storage_handler.run_context_processor.AWSTitanEmbeddings'), \
                 patch('src.context_handler.context_storage_handler.run_context_processor.ImageParserLLM'):
-            processor = EnhancedContextProcessor('/nonexistent/path', metrics_manager=metrics_manager_mock)
+            processor = EnhancedContextProcessor('/nonexistent/path', metrics_manager=global_metrics_manager_mock)
 
             with pytest.raises(FileNotFoundError):
                 processor.process_all_context_files()
@@ -746,13 +746,13 @@ class TestEnhancedContextProcessor:
 class TestHelperFunctions:
 
     @pytest.fixture
-    def processor(self, metrics_manager_mock):
+    def processor(self, global_metrics_manager_mock):
         """Create processor for helper function tests"""
         with patch('src.context_handler.context_storage_handler.run_context_processor.PGVectorConnector'), \
                 patch('src.context_handler.context_storage_handler.run_context_processor.AWSTitanEmbeddings'), \
                 patch('src.context_handler.context_storage_handler.run_context_processor.ImageParserLLM'):
             temp_dir = tempfile.mkdtemp()
-            processor = EnhancedContextProcessor(temp_dir, metrics_manager=metrics_manager_mock)
+            processor = EnhancedContextProcessor(temp_dir, metrics_manager=global_metrics_manager_mock)
             yield processor
             shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -794,13 +794,13 @@ class TestHelperFunctions:
 class TestPerformance:
 
     @pytest.fixture
-    def processor(self, metrics_manager_mock):
+    def processor(self, global_metrics_manager_mock):
         """Create processor for performance tests"""
         with patch('src.context_handler.context_storage_handler.run_context_processor.PGVectorConnector'), \
                 patch('src.context_handler.context_storage_handler.run_context_processor.AWSTitanEmbeddings'), \
                 patch('src.context_handler.context_storage_handler.run_context_processor.ImageParserLLM'):
             temp_dir = tempfile.mkdtemp()
-            processor = EnhancedContextProcessor(temp_dir, metrics_manager=metrics_manager_mock)
+            processor = EnhancedContextProcessor(temp_dir, metrics_manager=global_metrics_manager_mock)
             yield processor
             shutil.rmtree(temp_dir, ignore_errors=True)
 

@@ -8,17 +8,17 @@ from src.context_handler.context_storage_handler.metrics_reporter import Metrics
 
 class TestMetricsReporter:
     @pytest.fixture
-    def metrics_reporter(self, metrics_manager_mock):
+    def metrics_reporter(self, global_metrics_manager_mock):
         """Create a MetricsReporter instance with mocked dependencies"""
         with patch('boto3.client') as mock_boto_client:
-            reporter = MetricsReporter(collection_name='test_collection', metrics_manager=metrics_manager_mock)
+            reporter = MetricsReporter(collection_name='test_collection', metrics_manager=global_metrics_manager_mock)
             reporter.cloudwatch = mock_boto_client.return_value
             return reporter
 
-    def test_initialization(self, metrics_reporter, metrics_manager_mock):
+    def test_initialization(self, metrics_reporter, global_metrics_manager_mock):
         """Test initialization of MetricsReporter"""
         assert metrics_reporter.collection_name == 'test_collection'
-        assert metrics_reporter.metrics_manager == metrics_manager_mock
+        assert metrics_reporter.metrics_manager == global_metrics_manager_mock
         assert metrics_reporter.metrics['vector_store_operations'] == 0
         assert metrics_reporter.metrics['vector_query_operations'] == 0
         assert metrics_reporter.metrics['total_store_time'] == 0
@@ -38,7 +38,7 @@ class TestMetricsReporter:
                 assert reporter.cloudwatch is None
                 mock_log.assert_called_once_with("Could not initialize CloudWatch client for MetricsReporter")
 
-    def test_record_vector_operation_query(self, metrics_reporter, metrics_manager_mock):
+    def test_record_vector_operation_query(self, metrics_reporter, global_metrics_manager_mock):
         """Test recording a query operation"""
         metrics_reporter.record_vector_operation('query', 5, 1.5)
 
@@ -50,7 +50,7 @@ class TestMetricsReporter:
         assert metrics_reporter.metrics['avg_query_time'] == 1.5
 
         # Check metrics manager was called
-        metrics_manager_mock.record_vector_operation.assert_called_once_with(
+        global_metrics_manager_mock.record_vector_operation.assert_called_once_with(
             operation_type='query',
             item_count=5,
             duration=1.5
@@ -59,7 +59,7 @@ class TestMetricsReporter:
         # Check CloudWatch metrics were sent
         metrics_reporter.cloudwatch.put_metric_data.assert_called_once()
 
-    def test_record_vector_operation_store(self, metrics_reporter, metrics_manager_mock):
+    def test_record_vector_operation_store(self, metrics_reporter, global_metrics_manager_mock):
         """Test recording a store operation"""
         metrics_reporter.record_vector_operation('store', 10, 2.0)
 
@@ -71,7 +71,7 @@ class TestMetricsReporter:
         assert metrics_reporter.metrics['avg_store_time'] == 2.0
 
         # Check metrics manager was called
-        metrics_manager_mock.record_vector_operation.assert_called_once_with(
+        global_metrics_manager_mock.record_vector_operation.assert_called_once_with(
             operation_type='store',
             item_count=10,
             duration=2.0
@@ -104,9 +104,9 @@ class TestMetricsReporter:
         assert metrics_reporter.metrics['store_latencies'] == [2.0, 1.0]
         assert metrics_reporter.metrics['avg_store_time'] == 1.5  # (2.0 + 1.0) / 2
 
-    def test_record_vector_operation_metrics_manager_error(self, metrics_reporter, metrics_manager_mock):
+    def test_record_vector_operation_metrics_manager_error(self, metrics_reporter, global_metrics_manager_mock):
         """Test handling of errors from metrics manager"""
-        metrics_manager_mock.record_vector_operation.side_effect = Exception("Metrics error")
+        global_metrics_manager_mock.record_vector_operation.side_effect = Exception("Metrics error")
 
         # Should not raise exception
         with patch('logging.warning') as mock_log:
@@ -129,7 +129,7 @@ class TestMetricsReporter:
             mock_log.assert_called_once_with("Failed to send metrics to CloudWatch: CloudWatch error")
 
     def test_record_vector_operation_cloudwatch_error_with_metrics_manager(self, metrics_reporter,
-                                                                           metrics_manager_mock):
+                                                                           global_metrics_manager_mock):
         """Test CloudWatch error handling with metrics manager"""
         metrics_reporter.cloudwatch.put_metric_data.side_effect = Exception("CloudWatch error")
 
@@ -137,7 +137,7 @@ class TestMetricsReporter:
         metrics_reporter.record_vector_operation('query', 5, 1.5)
 
         # Check error was recorded
-        metrics_manager_mock.record_error.assert_called_once_with('cloudwatch_error', "CloudWatch error")
+        global_metrics_manager_mock.record_error.assert_called_once_with('cloudwatch_error', "CloudWatch error")
 
     def test_record_vector_operation_cloudwatch_error_without_metrics_manager(self):
         """Test CloudWatch error handling without metrics manager"""

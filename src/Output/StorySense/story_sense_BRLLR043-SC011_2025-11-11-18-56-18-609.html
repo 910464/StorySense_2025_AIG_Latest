@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Story Sense Analysis - User Story BRLLR043-SC011</title>
+            <style>
+                /* Modern CSS Variables */
+                :root {
+                    --primary-color: #3498db;
+                    --primary-dark: #2980b9;
+                    --success-color: #27ae60;
+                    --warning-color: #f39c12;
+                    --danger-color: #e74c3c;
+                    --dark-color: #2c3e50;
+                    --light-bg: #f8f9fa;
+                    --white: #ffffff;
+                    --gray-100: #f1f5f9;
+                    --gray-200: #e2e8f0;
+                    --gray-300: #cbd5e1;
+                    --gray-600: #475569;
+                    --gray-700: #334155;
+                    --gray-800: #1e293b;
+                    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+                    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+                    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+                    --border-radius: 12px;
+                    --border-radius-sm: 8px;
+                    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                * {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    background-color: #f5f7fa;
+                    padding: 20px;
+                }
+
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background: var(--white);
+                    border-radius: var(--border-radius);
+                    box-shadow: var(--shadow-lg);
+                    overflow: hidden;
+                }
+
+                /* Header Styles */
+                .header {
+                    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+                    color: white;
+                    padding: 40px;
+                    text-align: center;
+                    position: relative;
+                }
+
+                .header h1 {
+                    margin: 0 0 20px 0;
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                }
+
+                .header-info {
+                    display: flex;
+                    justify-content: center;
+                    gap: 40px;
+                    margin-bottom: 20px;
+                    flex-wrap: wrap;
+                }
+
+                .header-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 5px;
+                }
+
+                .header-label {
+                    font-size: 0.9rem;
+                    opacity: 0.9;
+                }
+
+                .header-value {
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                }
+
+                /* Section Styles */
+                .section {
+                    padding: 40px;
+                    border-bottom: 1px solid var(--gray-200);
+                }
+
+                .section:last-child {
+                    border-bottom: none;
+                }
+
+                .section h2 {
+                    color: var(--dark-color);
+                    font-size: 1.8rem;
+                    margin: 0 0 30px 0;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                /* User Story Section */
+                .story-content {
+                    background-color: var(--light-bg);
+                    padding: 20px;
+                    border-radius: var(--border-radius);
+                    margin-bottom: 20px;
+                    white-space: pre-wrap;
+                    font-family: monospace;
+                    border-left: 4px solid var(--primary-color);
+                }
+
+                /* Recommendations Section */
+                .recommendation-box {
+                    background-color: #f0f7ff;
+                    padding: 20px;
+                    border-radius: var(--border-radius);
+                    margin-bottom: 20px;
+                    border-left: 4px solid var(--primary-color);
+                }
+
+                .recommendation-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid var(--gray-200);
+                }
+
+                .recommendation-title {
+                    font-size: 1.3rem;
+                    font-weight: 600;
+                    color: var(--dark-color);
+                    margin: 0;
+                }
+
+                .recommendation-badge {
+                    padding: 5px 15px;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                }
+
+                .yes {
+                    background-color: var(--success-color);
+                    color: white;
+                }
+
+                .no {
+                    background-color: var(--gray-300);
+                    color: var(--gray-700);
+                }
+
+                .recommendation-section {
+                    margin-bottom: 20px;
+                }
+
+                .recommendation-section h4 {
+                    color: var(--dark-color);
+                    margin-bottom: 10px;
+                    font-size: 1.1rem;
+                }
+
+                .diff-box {
+                    background-color: var(--light-bg);
+                    padding: 15px;
+                    border-radius: var(--border-radius-sm);
+                    margin-bottom: 15px;
+                    white-space: pre-wrap;
+                    font-family: monospace;
+                    font-size: 14px;
+                    border-left: 3px solid var(--gray-300);
+                }
+
+                .improved-story {
+                    background-color: #e8f8f5;
+                    padding: 20px;
+                    border-radius: var(--border-radius);
+                    margin-top: 20px;
+                    border-left: 4px solid var(--success-color);
+                }
+
+                .improved-story h4 {
+                    color: var(--success-color);
+                    margin-bottom: 15px;
+                }
+
+                /* Scores Section */
+                .scores-overview {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 30px;
+                }
+
+                .overall-score {
+                    flex: 0 0 250px;
+                    text-align: center;
+                    padding: 30px;
+                    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+                    border-radius: var(--border-radius);
+                    color: white;
+                }
+
+                .score-circle {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.1);
+                    margin: 0 auto 15px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                }
+
+                .score-circle::before {
+                    content: '';
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    right: 5px;
+                    bottom: 5px;
+                    border-radius: 50%;
+                    border: 3px solid white;
+                }
+
+                .score-number {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                }
+
+                .score-label {
+                    font-size: 1rem;
+                    opacity: 0.9;
+                }
+
+                .score-interpretation {
+                    font-size: 1.1rem;
+                    margin-top: 15px;
+                }
+
+                .dimension-scores {
+                    flex: 1;
+                    margin-left: 30px;
+                }
+
+                .dimensions-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                    gap: 15px;
+                }
+
+                .dimension-card {
+                    background: white;
+                    border-radius: var(--border-radius-sm);
+                    padding: 15px;
+                    box-shadow: var(--shadow-sm);
+                    transition: var(--transition);
+                    border: 1px solid var(--gray-200);
+                }
+
+                .dimension-card:hover {
+                    transform: translateY(-3px);
+                    box-shadow: var(--shadow);
+                }
+
+                .dimension-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 10px;
+                }
+
+                .dimension-name {
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    color: var(--dark-color);
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+
+                .dimension-score {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                }
+
+                .dimension-bar {
+                    height: 6px;
+                    background: var(--gray-200);
+                    border-radius: 3px;
+                    overflow: hidden;
+                }
+
+                .dimension-fill {
+                    height: 100%;
+                    border-radius: 3px;
+                    transition: width 1s ease-in-out;
+                }
+
+                .good {
+                    color: var(--success-color);
+                }
+
+                .medium {
+                    color: var(--warning-color);
+                }
+
+                .poor {
+                    color: var(--danger-color);
+                }
+
+                .bg-good {
+                    background-color: var(--success-color);
+                }
+
+                .bg-medium {
+                    background-color: var(--warning-color);
+                }
+
+                .bg-poor {
+                    background-color: var(--danger-color);
+                }
+
+                /* Detailed Analysis Section */
+                .parameter-analysis {
+                    margin-bottom: 40px;
+                }
+
+                .parameter-card {
+                    background: white;
+                    border-radius: var(--border-radius);
+                    margin-bottom: 20px;
+                    box-shadow: var(--shadow-sm);
+                    border: 1px solid var(--gray-200);
+                    overflow: hidden;
+                }
+
+                .parameter-header {
+                    padding: 15px 20px;
+                    background: var(--light-bg);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                    transition: var(--transition);
+                    border-bottom: 1px solid var(--gray-200);
+                }
+
+                .parameter-header:hover {
+                    background: var(--gray-200);
+                }
+
+                .parameter-title {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: var(--dark-color);
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin: 0;
+                }
+
+                .parameter-score {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    padding: 3px 10px;
+                    border-radius: 15px;
+                }
+
+                .parameter-content {
+                    padding: 20px;
+                    display: none;
+                }
+
+                .parameter-content.active {
+                    display: block;
+                }
+
+                .parameter-justification {
+                    margin-bottom: 20px;
+                }
+
+                .parameter-recommendations {
+                    background: var(--light-bg);
+                    padding: 15px;
+                    border-radius: var(--border-radius-sm);
+                    border-left: 3px solid var(--primary-color);
+                }
+
+                .parameter-recommendations h4 {
+                    color: var(--primary-color);
+                    margin-top: 0;
+                    margin-bottom: 10px;
+                    font-size: 1rem;
+                }
+
+                .parameter-recommendations ul {
+                    margin: 0;
+                    padding-left: 20px;
+                }
+
+                .parameter-recommendations li {
+                    margin-bottom: 5px;
+                }
+
+                /* Insights and Risks Section */
+                .insights-risks-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 20px;
+                    margin-bottom: 30px;
+                }
+
+                .insights-card, .risks-card, .actions-card {
+                    background: white;
+                    border-radius: var(--border-radius);
+                    padding: 20px;
+                    box-shadow: var(--shadow-sm);
+                    border: 1px solid var(--gray-200);
+                }
+
+                .insights-card h3, .risks-card h3, .actions-card h3 {
+                    color: var(--dark-color);
+                    margin-bottom: 15px;
+                    font-size: 1.2rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .insight-item, .risk-item, .action-item {
+                    display: flex;
+                    margin-bottom: 10px;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid var(--gray-200);
+                }
+
+                .insight-item:last-child, .risk-item:last-child, .action-item:last-child {
+                    border-bottom: none;
+                    padding-bottom: 0;
+                    margin-bottom: 0;
+                }
+
+                .item-icon {
+                    flex: 0 0 30px;
+                    font-size: 1.2rem;
+                    color: var(--primary-color);
+                }
+
+                .item-text {
+                    flex: 1;
+                }
+
+                /* Parameter Education Section */
+                .education-section {
+                    background: var(--light-bg);
+                    border-radius: var(--border-radius);
+                    padding: 30px;
+                    margin-top: 40px;
+                }
+
+                .education-intro {
+                    text-align: center;
+                    max-width: 800px;
+                    margin: 0 auto 30px;
+                    font-size: 1.1rem;
+                    color: var(--gray-700);
+                }
+
+                .parameter-education-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+                    gap: 25px;
+                }
+
+                .education-card {
+                    background: white;
+                    border-radius: var(--border-radius);
+                    box-shadow: var(--shadow-sm);
+                    overflow: hidden;
+                    border: 1px solid var(--gray-200);
+                }
+
+                .education-header {
+                    padding: 15px 20px;
+                    background: var(--light-bg);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                    transition: var(--transition);
+                    border-bottom: 1px solid var(--gray-200);
+                }
+
+                .education-header:hover {
+                    background: var(--gray-200);
+                }
+
+                .education-title {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: var(--dark-color);
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin: 0;
+                }
+
+                .learn-more-btn {
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    padding: 5px 15px;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: var(--transition);
+                }
+
+                .learn-more-btn:hover {
+                    background: var(--primary-dark);
+                }
+
+                .education-content {
+                    padding: 0;
+                    max-height: 0;
+                    overflow: hidden;
+                    transition: max-height 0.5s ease, padding 0.3s ease;
+                }
+
+                .education-content.active {
+                    padding: 20px;
+                    max-height: 2000px;
+                }
+
+                .example-comparison {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    margin: 20px 0;
+                }
+
+                .good-example, .poor-example {
+                    padding: 15px;
+                    border-radius: var(--border-radius-sm);
+                }
+
+                .good-example {
+                    background-color: #d4edda;
+                    border-left: 4px solid var(--success-color);
+                }
+
+                .poor-example {
+                    background-color: #f8d7da;
+                    border-left: 4px solid var(--danger-color);
+                }
+
+                .example-text {
+                    background: rgba(255, 255, 255, 0.7);
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin: 10px 0;
+                    font-style: italic;
+                }
+
+                .improvement-tips {
+                    background: var(--light-bg);
+                    padding: 15px;
+                    border-radius: var(--border-radius-sm);
+                    margin-top: 20px;
+                    border-left: 3px solid var(--warning-color);
+                }
+
+                /* Context Information Section */
+                .context-info {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 15px;
+                    margin-top: 20px;
+                }
+
+                .context-item {
+                    background: white;
+                    border-radius: var(--border-radius-sm);
+                    padding: 15px;
+                    box-shadow: var(--shadow-sm);
+                    text-align: center;
+                    border: 1px solid var(--gray-200);
+                }
+
+                .context-label {
+                    font-size: 0.9rem;
+                    color: var(--gray-600);
+                    margin-bottom: 5px;
+                }
+
+                .context-value {
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                    color: var(--primary-color);
+                }
+
+                .context-high {
+                    color: var(--success-color);
+                }
+
+                .context-medium {
+                    color: var(--warning-color);
+                }
+
+                .context-low {
+                    color: var(--danger-color);
+                }
+
+                .context-none {
+                    color: var(--gray-600);
+                }
+
+                /* File Type Section */
+                .file-type-section {
+                    margin-top: 20px;
+                    background: var(--light-bg);
+                    border-radius: var(--border-radius);
+                    padding: 20px;
+                    border: 1px solid var(--gray-200);
+                }
+
+                .file-type-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                    gap: 15px;
+                    margin-top: 15px;
+                }
+
+                .file-type-item {
+                    background: white;
+                    border-radius: var(--border-radius-sm);
+                    padding: 15px 10px;
+                    text-align: center;
+                    box-shadow: var(--shadow-sm);
+                    border: 1px solid var(--gray-200);
+                    transition: var(--transition);
+                }
+
+                .file-type-item:hover {
+                    transform: translateY(-3px);
+                    box-shadow: var(--shadow);
+                }
+
+                .file-type-icon {
+                    font-size: 24px;
+                    margin-bottom: 5px;
+                }
+
+                .file-type-name {
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    color: var(--dark-color);
+                    margin-bottom: 5px;
+                }
+
+                .file-type-count {
+                    font-size: 1.1rem;
+                    font-weight: 700;
+                    color: var(--primary-color);
+                }
+
+                /* File type specific colors */
+                .file-pdf .file-type-icon { color: #e74c3c; }
+                .file-doc .file-type-icon { color: #3498db; }
+                .file-excel .file-type-icon { color: #27ae60; }
+                .file-ppt .file-type-icon { color: #e67e22; }
+                .file-text .file-type-icon { color: #95a5a6; }
+                .file-image .file-type-icon { color: #9b59b6; }
+                .file-story .file-type-icon { color: #f39c12; }
+
+                /* Context Analysis Section */
+                .context-analysis {
+                    margin-top: 20px;
+                    background: var(--light-bg);
+                    border-radius: var(--border-radius);
+                    padding: 20px;
+                    border: 1px solid var(--gray-200);
+                }
+
+                .context-analysis h4 {
+                    margin-top: 0;
+                    margin-bottom: 15px;
+                    color: var(--dark-color);
+                }
+
+                .context-analysis h5 {
+                    color: var(--primary-color);
+                    margin-bottom: 10px;
+                    font-size: 1rem;
+                }
+
+                .useful-types ul {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    list-style: none;
+                    padding: 0;
+                    margin: 0 0 15px 0;
+                }
+
+                .useful-types li {
+                    background: white;
+                    padding: 5px 12px;
+                    border-radius: 20px;
+                    font-size: 0.9rem;
+                    box-shadow: var(--shadow-sm);
+                    border: 1px solid var(--gray-200);
+                }
+
+                .quality-assessment p {
+                    background: white;
+                    padding: 15px;
+                    border-radius: var(--border-radius-sm);
+                    margin: 0;
+                    border-left: 3px solid var(--primary-color);
+                }
+
+                /* Responsive Design */
+                @media (max-width: 768px) {
+                    .section {
+                        padding: 30px 20px;
+                    }
+
+                    .scores-overview {
+                        flex-direction: column;
+                    }
+
+                    .overall-score {
+                        margin-bottom: 20px;
+                    }
+
+                    .dimension-scores {
+                        margin-left: 0;
+                    }
+
+                    .dimensions-grid {
+                        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                    }
+
+                    .example-comparison {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .header {
+                        padding: 30px 20px;
+                    }
+
+                    .header h1 {
+                        font-size: 2rem;
+                    }
+
+                    .score-circle {
+                        width: 100px;
+                        height: 100px;
+                    }
+
+                    .score-number {
+                        font-size: 2rem;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Story Sense Analysis Report</h1>
+                    <div class="header-info">
+                        <div class="header-item">
+                            <span class="header-label">User Story ID</span>
+                            <span class="header-value">BRLLR043-SC011</span>
+                        </div>
+                        <div class="header-item">
+                            <span class="header-label">Overall Score</span>
+                            <span class="header-value">10.0/10</span>
+                        </div>
+                        <div class="header-item">
+                            <span class="header-label">Generated On</span>
+                            <span class="header-value">2025-11-11 18:56</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>📝 User Story</h2>
+                    <div class="story-content">User Story Description:Displaying of warning message if default Billing Type Option is changed
+Acceptance Criteria : 
+GIVEN an UW/UA/Ops/UW Support user has navigated to the Payment Plan Options screen of a new
+submission
+AND the system has automatically defaulted the Billing Type field
+WHEN the user clicks on the ‘Billing Type’ dropdown list
+AND selects an alternative option to that which was defaulted
+THEN the system will display the warning message “Please validate that the billing option value selected
+is correct; changes beyond this stage will require a new policy number”. (Wording To Be Confirmed)
+AND the ‘Billing Type’ field will be updated with the selected value</div>
+                </div>
+
+                <div class="section">
+                    <h2>💡 Recommended Improvements</h2>
+                    <div class="recommendation-box">
+                        <div class="recommendation-header">
+                            <h3 class="recommendation-title">Changes Recommended</h3>
+                            <span class="recommendation-badge no">NO</span>
+                        </div>
+
+                        <div class="recommendation-section">
+                            <h4>Description Changes:</h4>
+                            <div class="diff-box">N/A</div>
+                        </div>
+
+                        <div class="recommendation-section">
+                            <h4>Acceptance Criteria Changes:</h4>
+                            <div class="diff-box">N/A</div>
+                        </div>
+
+                        <div class="improved-story">
+                            <h4>Improved User Story:</h4>
+                            <div class="story-content">Title: Online payment option for utility bills 
+Description: As a registered user, I want to be able to pay all my utility bills (such as water, electricity, and gas) online so that I can avoid the hassle of manual payment methods and keep track of my previous payments.
+Acceptance Criteria:
+1. The user should be able to view all utility bills the moment they log in.
+2. The user should be able to select any of utility bills listed and see the detailed bill.
+3. The system should provide the option for online payment for the selected bill.
+4. Once the payment is successful, the system should update the bill status and provide the user with a receipt.
+5. The user should be allowed to download and save the receipt for their records.
+6. The user should be able to view his payment history.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>📊 Quality Score Analysis</h2>
+
+                    <div class="scores-overview">
+                        <div class="overall-score">
+                            <div class="score-circle">
+                                <div class="score-number">10.0</div>
+                            </div>
+                            <div class="score-label">Overall Score</div>
+                            <div class="score-interpretation">🎉 Excellent! Your story is well-crafted and ready for development.</div>
+                        </div>
+
+                        <div class="dimension-scores">
+                            <div class="dimensions-grid">
+                                
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">👤 User-Centered</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">🔗 Independent</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">💬 Negotiable</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">💎 Valuable</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">📏 Estimable</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">📦 Small</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">🧪 Testable</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">✅ Acceptance Criteria</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">🎯 Prioritized</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-name">🤝 Collaboration</div>
+                    <div class="dimension-score good">10/10</div>
+                </div>
+                <div class="dimension-bar">
+                    <div class="dimension-fill bg-good" data-width="100%" style="width: 0%"></div>
+                </div>
+            </div>
+            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>🔍 Detailed Analysis</h2>
+
+                    <div class="parameter-analysis">
+                        
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">👤 User-Centered</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">🔗 Independent</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">💬 Negotiable</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">💎 Valuable</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">📏 Estimable</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">📦 Small</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">🧪 Testable</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">✅ Acceptance Criteria</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">🎯 Prioritized</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="parameter-card">
+                <div class="parameter-header">
+                    <h3 class="parameter-title">🤝 Collaboration</h3>
+                    <span class="parameter-score good">10/10</span>
+                </div>
+                <div class="parameter-content">
+                    <div class="parameter-justification">
+                        <p>N/A</p>
+                    </div>
+                    
+                <div class="parameter-recommendations">
+                    <h4>💡 Excellent Work!</h4>
+                    <p>This aspect of your user story is excellent! No improvements needed.</p>
+                </div>
+                
+                </div>
+            </div>
+            
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>💎 Key Insights & Recommendations</h2>
+
+                    <div class="insights-risks-grid">
+                        <div class="insights-card">
+                            <h3>🔍 Key Insights</h3>
+                            
+            <div class="insight-item">
+                <div class="item-icon">ℹ️</div>
+                <div class="item-text">No specific insights available for this user story.</div>
+            </div>
+            
+                        </div>
+
+                        <div class="risks-card">
+                            <h3>⚠️ Potential Risks</h3>
+                            
+            <div class="risk-item">
+                <div class="item-icon">✅</div>
+                <div class="item-text">No significant risks identified for this user story.</div>
+            </div>
+            
+                        </div>
+                    </div>
+
+                    <div class="actions-card">
+                        <h3>🎯 Action Items</h3>
+                        
+            <div class="action-item">
+                <div class="item-icon">✓</div>
+                <div class="item-text">Continue with the current user story - it meets quality standards.</div>
+            </div>
+            
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>📚 Context Information</h2>
+
+                    <div class="context-info">
+                        <div class="context-item">
+                            <div class="context-label">Context Quality</div>
+                            <div class="context-value context-low">Low</div>
+                        </div>
+
+                        <div class="context-item">
+                            <div class="context-label">Context Documents</div>
+                            <div class="context-value">8</div>
+                        </div>
+
+                        <div class="context-item">
+                            <div class="context-label">Processing Time</div>
+                            <div class="context-value">11.79s</div>
+                        </div>
+
+                        <div class="context-item">
+                            <div class="context-label">Analysis Model</div>
+                            <div class="context-value">Claude 3 Sonnet</div>
+                        </div>
+                    </div>
+
+                    
+            <div class="file-type-section">
+                <h4>📄 Context File Types</h4>
+                <div class="file-type-grid">
+            
+                <div class="file-type-item file-unknown">
+                    <div class="file-type-icon">📄</div>
+                    <div class="file-type-name">excel</div>
+                    <div class="file-type-count">8</div>
+                </div>
+                
+                </div>
+            </div>
+            
+
+                    
+        <div class="context-analysis">
+            <h4>🔍 Context Analysis</h4>
+        
+            <div class="quality-assessment">
+                <h5>Quality Assessment:</h5>
+                <p>The provided user story is a high-quality example, so no additional context was needed for the analysis.</p>
+            </div>
+        </div>
+        
+                </div>
+
+                <div class="section">
+                    <h2>📖 Understanding the Analysis Parameters</h2>
+
+                    <p class="education-intro">
+                        This analysis evaluates your user story against 10 key quality parameters based on the INVEST criteria and industry best practices.
+                        Click on each parameter below to learn what it means, see examples, and understand how to improve your stories.
+                    </p>
+
+                    <div class="parameter-education-grid">
+                        
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">👤 User-Centered</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>A user-centered story focuses on the person who will actually use the feature, clearly identifying who they are and why they need this functionality.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">"As a busy working parent, I want to quickly reorder my usual groceries from my purchase history so that I can save time during my weekly shopping and spend more time with my family."</div>
+                    <p>This clearly identifies the specific user type (busy working parent), their context, and their motivation (save time for family).</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">"As a user, I want a button that calls the API endpoint to retrieve order history from the database."</div>
+                    <p>This focuses on technical implementation rather than user needs and uses the generic term "user" without context.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Be specific about who the user is (role, context, characteristics)</li><li>Focus on the user's goal, not the system's functionality</li><li>Explain the user's motivation clearly in the "so that" clause</li><li>Avoid technical jargon and system-focused language</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">🔗 Independent</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>An independent story can be developed, tested, and delivered without waiting for other stories to be completed first.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">"As a registered user, I want to reset my password via email so that I can regain access to my account if I forget my credentials."</div>
+                    <p>This can be implemented independently and provides immediate value without requiring other features.</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">"As a user, I want to share my completed profile with friends so that they can see my information."</div>
+                    <p>This depends on profile creation, friend management, and sharing features being completed first.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Avoid references to other unfinished features</li><li>Ensure the story provides value on its own</li><li>Break down large features into smaller, independent pieces</li><li>Consider what minimum functionality is needed for the story to be useful</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">💬 Negotiable</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>A negotiable story focuses on the "what" and "why" rather than the "how," leaving room for discussion about implementation details.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">"As a customer, I want to be notified when my order status changes so that I can track my purchase progress."</div>
+                    <p>This describes the need without specifying whether notifications should be email, SMS, push notifications, or in-app alerts.</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">"As a customer, I want a blue popup window with Arial font to appear in the top-right corner showing order status updates every 30 seconds."</div>
+                    <p>This dictates specific implementation details, leaving no room for better solutions or user experience improvements.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Focus on the outcome, not the implementation method</li><li>Avoid specifying UI elements, colors, or exact layouts</li><li>Leave technical decisions to the development team</li><li>Use acceptance criteria to define boundaries, not exact solutions</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">💎 Valuable</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>A valuable story delivers clear, measurable benefit to users or the business.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">"As a mobile user, I want to use biometric authentication so that I can access my banking app quickly and securely without typing passwords."</div>
+                    <p>Clear value: faster access, better security, improved user experience for a critical use case.</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">"As a user, I want the logo to be 2 pixels larger so that it looks better."</div>
+                    <p>The value is subjective and minimal - unlikely to significantly impact user experience or business metrics.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Clearly articulate the benefit in the "so that" clause</li><li>Consider both user value and business value</li><li>Quantify the impact when possible (time saved, errors reduced, etc.)</li><li>Ensure the value justifies the development effort</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">📏 Estimable</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>An estimable story contains enough detail and clarity that developers can reasonably estimate the effort required.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">"As a customer service rep, I want to search for customers by email address so that I can quickly find their account information during support calls."</div>
+                    <p>Clear scope: search functionality, specific field (email), defined use case. Developers can estimate this.</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">"As a user, I want the system to be more intelligent and intuitive."</div>
+                    <p>Too vague - "intelligent" and "intuitive" are subjective and don't define specific functionality to implement.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Provide enough context about the functionality needed</li><li>Define clear boundaries with acceptance criteria</li><li>Avoid vague terms like "better," "faster," or "more user-friendly"</li><li>Include relevant business rules or constraints</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">📦 Small</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>A small story is appropriately sized to be completed within a single iteration or sprint.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">"As a user, I want to update my email address in my profile so that I receive notifications at my current email."</div>
+                    <p>Focused on one specific action: updating email address. Can be completed in a few days.</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">"As a user, I want a complete customer relationship management system so that I can manage all my business relationships."</div>
+                    <p>This is an epic, not a story. It would take months to implement and should be broken into dozens of smaller stories.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Focus on one specific piece of functionality</li><li>Break large features into smaller, deliverable pieces</li><li>Aim for stories that can be completed in 1-3 days</li><li>Consider the minimum viable version of the feature</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">🧪 Testable</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>A testable story has clear, verifiable criteria that define when the story is complete.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">"As a user, I want to receive an email confirmation within 5 minutes of placing an order so that I know my purchase was successful."</div>
+                    <p>Specific, measurable criteria: email sent, within 5 minutes, after order placement. Easy to test.</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">"As a user, I want the website to feel more responsive and modern."</div>
+                    <p>"Feel more responsive" and "modern" are subjective - there's no clear way to verify when this is complete.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Use specific, measurable language</li><li>Define clear success criteria</li><li>Avoid subjective terms like "better," "nice," or "user-friendly"</li><li>Think about how you would demonstrate the feature working</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">✅ Acceptance Criteria</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>Good acceptance criteria are specific, measurable conditions that must be met for the story to be considered complete.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">1. User can enter email address in login form
+2. System validates email format before submission
+3. Invalid emails show error message "Please enter a valid email"
+4. Valid emails proceed to password field
+5. Email field remembers last successful login</div>
+                    <p>Specific, testable conditions that clearly define what needs to be built.</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">1. Login should work properly
+2. Users should be happy with the experience
+3. No bugs</div>
+                    <p>Too vague - "work properly," "happy," and "no bugs" don't provide clear guidance for implementation or testing.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Write 3-7 specific, testable conditions</li><li>Use "Given-When-Then" format when helpful</li><li>Include both positive and negative test cases</li><li>Define error conditions and edge cases</li><li>Specify any business rules or constraints</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">🎯 Prioritized</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>A prioritized story has a clear understanding of its importance relative to other work.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">Priority: High - Critical for Q1 launch
+Business Value: Reduces customer support calls by 40%
+User Impact: Affects 80% of daily active users</div>
+                    <p>Clear rationale for priority based on measurable business impact and user benefit.</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">Priority: Medium
+Reason: Would be nice to have</div>
+                    <p>No clear justification for priority - "nice to have" doesn't help with planning or resource allocation.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Clearly state the priority level (High/Medium/Low or numerical)</li><li>Explain the rationale behind the priority</li><li>Consider business value, user impact, and technical risk</li><li>Relate to business goals or strategic initiatives</li><li>Include any time constraints or dependencies</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+            <div class="education-card">
+                <div class="education-header">
+                    <h3 class="education-title">🤝 Collaboration & Understanding</h3>
+                    <button class="learn-more-btn">Learn More</button>
+                </div>
+                <div class="education-content">
+                    <h4>What does this mean?</h4>
+                    <p>A story that promotes collaboration is written in language that all team members can understand.</p>
+
+                    
+            <div class="example-comparison">
+                <div class="good-example">
+                    <h5>✅ Good Example</h5>
+                    <div class="example-text">"As a customer service representative, I want to quickly access a customer's recent order history during phone calls so that I can provide faster, more helpful support without putting customers on hold."</div>
+                    <p>Clear language that business stakeholders, developers, and testers can all understand and discuss.</p>
+                </div>
+
+                <div class="poor-example">
+                    <h5>❌ Poor Example</h5>
+                    <div class="example-text">"As a system administrator, I want to implement a RESTful API endpoint with OAuth 2.0 authentication that queries the PostgreSQL database using indexed joins."</div>
+                    <p>Too technical - business stakeholders can't meaningfully participate in discussions about this story.</p>
+                </div>
+            </div>
+            
+
+                    
+            <div class="improvement-tips">
+                <h5>💡 How to Improve:</h5>
+                <ul>
+                    <li>Use business language, not technical jargon</li><li>Write for your least technical stakeholder</li><li>Focus on user outcomes rather than system behavior</li><li>Include context that helps everyone understand the need</li><li>Encourage questions and discussion during story review</li>
+                </ul>
+            </div>
+            
+                </div>
+            </div>
+            
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Initialize interactive features
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Initialize parameter cards
+                    initializeParameterCards();
+
+                    // Initialize education cards
+                    initializeEducationCards();
+
+                    // Animate dimension bars
+                    animateDimensionBars();
+                });
+
+                function initializeParameterCards() {
+                    const parameterHeaders = document.querySelectorAll('.parameter-header');
+
+                    parameterHeaders.forEach(header => {
+                        header.addEventListener('click', function() {
+                            const content = this.nextElementSibling;
+                            const isActive = content.classList.contains('active');
+
+                            // Close all parameter contents
+                            document.querySelectorAll('.parameter-content').forEach(item => {
+                                item.classList.remove('active');
+                            });
+
+                            // Toggle current content
+                            if (!isActive) {
+                                content.classList.add('active');
+                            }
+                        });
+                    });
+
+                    // Open the first parameter card by default
+                    const firstContent = document.querySelector('.parameter-content');
+                    if (firstContent) {
+                        firstContent.classList.add('active');
+                    }
+                }
+
+                function initializeEducationCards() {
+                    const educationHeaders = document.querySelectorAll('.education-header');
+
+                    educationHeaders.forEach(header => {
+                        header.addEventListener('click', function() {
+                            const content = this.nextElementSibling;
+                            const isActive = content.classList.contains('active');
+                            const button = this.querySelector('.learn-more-btn');
+
+                            // Close all education contents
+                            document.querySelectorAll('.education-content').forEach(item => {
+                                item.classList.remove('active');
+                            });
+
+                            document.querySelectorAll('.learn-more-btn').forEach(btn => {
+                                btn.textContent = 'Learn More';
+                            });
+
+                            // Toggle current content
+                            if (!isActive) {
+                                content.classList.add('active');
+                                if (button) {
+                                    button.textContent = 'Show Less';
+                                }
+                            }
+                        });
+                    });
+                }
+
+                function animateDimensionBars() {
+                    const dimensionFills = document.querySelectorAll('.dimension-fill');
+
+                    setTimeout(() => {
+                        dimensionFills.forEach(fill => {
+                            const width = fill.getAttribute('data-width');
+                            fill.style.width = width;
+                        });
+                    }, 300);
+                }
+            </script>
+        </body>
+        </html>
+        

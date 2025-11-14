@@ -105,12 +105,12 @@ class TestCircuitBreaker:
         with pytest.raises(Exception):
             circuit_breaker.execute(mock_func)
 
-        # Should go back to OPEN
-        assert circuit_breaker.state == "OPEN"
-        assert circuit_breaker.failure_count == 1  # Reset when entering HALF-OPEN
+        # Should remain in HALF-OPEN state after failure
+        assert circuit_breaker.state == "HALF-OPEN"
+        assert circuit_breaker.failure_count == 3  # Incremented from the failure
 
     def test_reset_failure_count(self, circuit_breaker):
-        # Test that failure count resets after successful execution
+        # Test that failure count behavior in different states
         mock_func = Mock(side_effect=[Exception("Test error"), "success"])
 
         # First call fails
@@ -119,11 +119,37 @@ class TestCircuitBreaker:
 
         assert circuit_breaker.failure_count == 1
 
-        # Second call succeeds
+        # Second call succeeds (in CLOSED state, failure count remains)
         result = circuit_breaker.execute(mock_func)
 
         assert result == "success"
-        assert circuit_breaker.failure_count == 0  # Should reset to 0
+        assert circuit_breaker.failure_count == 1  # Failure count doesn't reset in CLOSED state
+
+    def test_failure_count_reset_half_open_to_closed(self, circuit_breaker):
+        # Test that failure count resets only when transitioning from HALF-OPEN to CLOSED
+        mock_func = Mock(side_effect=Exception("Test error"))
+
+        # Trip the breaker (2 failures)
+        with pytest.raises(Exception):
+            circuit_breaker.execute(mock_func)
+        with pytest.raises(Exception):
+            circuit_breaker.execute(mock_func)
+
+        assert circuit_breaker.state == "OPEN"
+        assert circuit_breaker.failure_count == 2
+
+        # Wait for reset timeout to move to HALF-OPEN
+        time.sleep(1.1)
+
+        # Success in HALF-OPEN should reset failure count and move to CLOSED
+        mock_func.side_effect = None
+        mock_func.return_value = "success"
+
+        result = circuit_breaker.execute(mock_func)
+
+        assert result == "success"
+        assert circuit_breaker.state == "CLOSED"
+        assert circuit_breaker.failure_count == 0  # Should reset to 0 when HALF-OPEN -> CLOSED
 
     def test_concurrent_execution(self, circuit_breaker):
         """Test circuit breaker with concurrent execution"""

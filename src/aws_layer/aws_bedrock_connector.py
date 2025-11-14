@@ -137,8 +137,13 @@ class AWSBedrockConnector:
         except Exception as e:
             logging.error(f"Error resizing and encoding image {image_path}: {e}")
             # Fallback to original encoding if resizing fails
+            # Determine format from file extension
+            import os
+            file_ext = os.path.splitext(image_path.lower())[1][1:]  # Remove the dot
+            media_type = f"image/{file_ext}" if file_ext else "image/jpeg"
+            
             with open(image_path, "rb") as image_file:
-                return base64.b64encode(image_file.read()).decode('utf-8'), f"image/{img.format.lower()}"
+                return base64.b64encode(image_file.read()).decode('utf-8'), media_type
 
     def generate_response_multimodal(self, prompt, image_path, temperature, max_tokens, call_type):
         """
@@ -290,26 +295,25 @@ class AWSBedrockConnector:
 
                 # Apply guardrails if configured
                 if hasattr(self, 'use_guardrails') and self.use_guardrails:
-                    # guardrail_config = os.get('default', {})
                     guardrail_id = os.getenv('guardrail_id')
                     guardrail_region = os.getenv('region')
 
-                    # if guardrail_id:
-                    #     logging.info(f"Applying guardrail {guardrail_id} to request")
+                    if guardrail_id:
+                        logging.info(f"Applying guardrail {guardrail_id} to request")
 
-                    #     # Add guardrail configuration to the request
-                    #     request_body["guardrailConfig"] = {
-                    #         "guardrailId": guardrail_id,
-                    #         "guardrailVersion": "DRAFT"  # or "LATEST" for the latest published version
-                    #     }
+                        # Add guardrail configuration to the request
+                        request_body["guardrailConfig"] = {
+                            "guardrailId": guardrail_id,
+                            "guardrailVersion": "DRAFT"  # or "LATEST" for the latest published version
+                        }
 
-                    #     # Create a bedrock client in the guardrail's region if different
-                    #     if guardrail_region != self.session.region_name:
-                    #         bedrock_runtime = boto3.client('bedrock-runtime', region_name=guardrail_region)
-                    #     else:
-                    #         bedrock_runtime = self.bedrock_runtime
-                    # else:
-                    #     bedrock_runtime = self.bedrock_runtime
+                        # Create a bedrock client in the guardrail's region if different
+                        if guardrail_region and hasattr(self, 'session') and guardrail_region != self.session.region_name:
+                            bedrock_runtime = boto3.client('bedrock-runtime', region_name=guardrail_region)
+                        else:
+                            bedrock_runtime = self.bedrock_runtime
+                    else:
+                        bedrock_runtime = self.bedrock_runtime
                 else:
                     bedrock_runtime = self.bedrock_runtime
 

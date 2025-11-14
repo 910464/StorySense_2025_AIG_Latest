@@ -12,7 +12,7 @@ from src.context_handler.context_file_handler.context_manager import ContextMana
 
 class TestContextManager:
     @pytest.fixture
-    def metrics_manager_mock(self):
+    def global_metrics_manager_mock(self):
         """Mock metrics manager for testing"""
         mock = Mock()
         mock.record_llm_call = Mock()
@@ -30,11 +30,11 @@ class TestContextManager:
         return mock
 
     @pytest.fixture
-    def context_manager(self, metrics_manager_mock, pgvector_connector_mock):
+    def context_manager(self, global_metrics_manager_mock, pgvector_connector_mock):
         """Create a ContextManager instance with mocked dependencies"""
         with patch('src.context_handler.context_file_handler.context_manager.PGVectorConnector',
                    return_value=pgvector_connector_mock):
-            manager = ContextManager(metrics_manager=metrics_manager_mock)
+            manager = ContextManager(metrics_manager=global_metrics_manager_mock)
             # Mock the context collections
             manager.context_collections = {
                 'business_rules': pgvector_connector_mock,
@@ -62,8 +62,13 @@ class TestContextManager:
     def temp_context_dir(self):
         """Create a temporary directory for context files"""
         temp_dir = tempfile.mkdtemp()
+        print(f"Created temp directory: {temp_dir}")
         yield temp_dir
-        shutil.rmtree(temp_dir)
+        # Clean up
+        try:
+            shutil.rmtree(temp_dir)
+        except Exception as e:
+            print(f"Error cleaning up temp dir: {e}")
 
     @pytest.fixture
     def sample_document(self):
@@ -76,13 +81,13 @@ class TestContextManager:
             }
         }
 
-    def test_initialization(self, metrics_manager_mock):
+    def test_initialization(self, global_metrics_manager_mock):
         """Test initialization of ContextManager"""
         with patch('src.context_handler.context_file_handler.context_manager.PGVectorConnector') as mock_pgvector:
             # Configure the mock to return a new mock for each call
             mock_pgvector.side_effect = lambda **kwargs: Mock()
 
-            manager = ContextManager(metrics_manager=metrics_manager_mock)
+            manager = ContextManager(metrics_manager=global_metrics_manager_mock)
 
             # Check that context collections were initialized
             assert 'business_rules' in manager.context_collections
@@ -149,35 +154,41 @@ class TestContextManager:
             assert 'business_rules' in result['collections_updated']
             assert 'documentation' in result['collections_updated']
 
-    def test_find_supported_files(self, context_manager, temp_context_dir):
+    def test_find_supported_files(self, context_manager):
         """Test _find_supported_files method"""
-        # Create some test files
-        pdf_file = os.path.join(temp_context_dir, 'test.pdf')
-        docx_file = os.path.join(temp_context_dir, 'test.docx')
-        txt_file = os.path.join(temp_context_dir, 'test.txt')
-        unsupported_file = os.path.join(temp_context_dir, 'test.xyz')
+        # Use a simpler approach - create temp directory in test
+        import tempfile
+        
+        with tempfile.TemporaryDirectory() as temp_dir:
+            print(f"Using temp directory: {temp_dir}")
+            
+            # Create some test files
+            pdf_file = os.path.join(temp_dir, 'test.pdf')
+            docx_file = os.path.join(temp_dir, 'test.docx')
+            txt_file = os.path.join(temp_dir, 'test.txt')
+            unsupported_file = os.path.join(temp_dir, 'test.xyz')
 
-        # Create empty files
-        for file_path in [pdf_file, docx_file, txt_file, unsupported_file]:
-            with open(file_path, 'w') as f:
-                f.write('')
+            # Create empty files
+            files_to_create = [pdf_file, docx_file, txt_file, unsupported_file]
+            for file_path in files_to_create:
+                Path(file_path).touch()  # Use pathlib to create files
+                print(f"Created: {file_path}, exists: {os.path.exists(file_path)}")
 
-        # Mock the supported file types
-        context_manager.document_processor.file_processors = {
-            '.pdf': Mock(),
-            '.docx': Mock(),
-            '.txt': Mock()
-        }
+            # Verify all files exist
+            files_in_dir = os.listdir(temp_dir)
+            print(f"Files in temp dir: {files_in_dir}")
+            assert len(files_in_dir) == 4, f"Expected 4 files, got {len(files_in_dir)}"
+            
+            # Call the method
+            result = context_manager._find_supported_files(temp_dir)
+            print(f"Method result: {result}")
 
-        # Call the method
-        result = context_manager._find_supported_files(temp_context_dir)
-
-        # Check that only supported files were found
-        assert len(result) == 3
-        assert pdf_file in result
-        assert docx_file in result
-        assert txt_file in result
-        assert unsupported_file not in result
+            # Check that only supported files were found
+            assert len(result) == 3
+            assert pdf_file in result
+            assert docx_file in result
+            assert txt_file in result
+            assert unsupported_file not in result
 
     def test_process_files_with_duplicate_check(self, context_manager):
         """Test _process_files_with_duplicate_check method"""
@@ -492,3 +503,120 @@ class TestContextManager:
         assert result['pdf'] == 3
         assert result['docx'] == 2
         assert result['txt'] == 1
+
+    def test_check_and_process_context_library_with_failed_files(self, context_manager):
+        """Test check_and_process_context_library with files that fail to process"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create a test file
+            test_file = os.path.join(temp_dir, 'test.pdf')
+            Path(test_file).touch()
+
+            with patch('os.path.exists', return_value=True), \
+                    patch.object(context_manager, '_find_supported_files', return_value=[test_file]), \
+                    patch.object(context_manager, '_process_files_with_duplicate_check') as mock_process:
+                # Configure mock_process to return a result with failed files
+                mock_process.return_value = {
+                    'new_files': 0,
+                    'skipped_files': 0,
+                    'failed_files': 1,
+                    'total_documents': 0,
+                    'collections_updated': set(),
+                    'processing_details': [],
+                    'skipped_details': []
+                }
+
+                result = context_manager.check_and_process_context_library(temp_dir)
+
+                # Should return appropriate status
+                assert result['status'] == 'context_processed'
+                assert result['has_context'] is False  # No documents due to failure
+                assert result['processed_files'] == 0
+
+    def test_check_and_process_context_library_with_skipped_files(self, context_manager):
+        """Test check_and_process_context_library with files that are skipped"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create a test file
+            test_file = os.path.join(temp_dir, 'test.pdf')
+            Path(test_file).touch()
+
+            with patch('os.path.exists', return_value=True), \
+                    patch.object(context_manager, '_find_supported_files', return_value=[test_file]), \
+                    patch.object(context_manager, '_process_files_with_duplicate_check') as mock_process:
+                # Configure mock_process to return a result with skipped files
+                mock_process.return_value = {
+                    'new_files': 0,
+                    'skipped_files': 1,
+                    'failed_files': 0,
+                    'total_documents': 5,  # Already existing documents
+                    'collections_updated': set(),
+                    'processing_details': [],
+                    'skipped_details': []
+                }
+
+                result = context_manager.check_and_process_context_library(temp_dir)
+
+                # Should return appropriate status
+                assert result['status'] == 'context_processed'
+                assert result['has_context'] is True  # Has existing documents
+                assert result['processed_files'] == 0
+                assert result['skipped_files'] == 1
+
+    def test_process_files_with_duplicate_check_exception(self, context_manager):
+        """Test _process_files_with_duplicate_check when an exception occurs"""
+        # Mock document registry to raise an exception
+        context_manager.document_registry.is_document_processed.side_effect = Exception("Registry error")
+
+        # Call the method
+        result = context_manager._process_files_with_duplicate_check(['/path/to/file.pdf'])
+
+        # Check results - should handle the exception gracefully
+        assert result['failed_files'] == 1
+        assert result['new_files'] == 0
+        assert result['skipped_files'] == 0
+
+    def test_get_example_description(self, context_manager):
+        """Test _get_example_description method for various file types"""
+        # Test known file
+        desc = context_manager._get_example_description('payment_processing_rules.pdf')
+        assert 'payment' in desc.lower()
+        
+        # Test unknown file
+        desc = context_manager._get_example_description('unknown_file.doc')
+        assert 'Context file for user story analysis' in desc
+
+    def test_check_and_process_context_library_default_directory(self, context_manager):
+        """Test check_and_process_context_library when context_directory is None (default)"""
+        with patch('os.path.exists', return_value=False), \
+                patch.object(context_manager, '_create_context_directory_structure') as mock_create_dir:
+            # Call method with None (default) directory
+            result = context_manager.check_and_process_context_library(context_directory=None)
+
+            # Should use default directory and create structure
+            mock_create_dir.assert_called_once_with('./Input/ContextLibrary')
+
+            # Should return appropriate status
+            assert result['status'] == 'no_context_directory'
+            assert not result['has_context']
+
+    def test_process_files_with_failed_processing(self, context_manager):
+        """Test _process_files_with_duplicate_check with files that fail processing"""
+        # Mock document registry to not find duplicates
+        context_manager.document_registry.is_document_processed.return_value = {'exists': False}
+        
+        # Mock _process_single_file to return failure
+        with patch.object(context_manager, '_process_single_file') as mock_process:
+            mock_process.return_value = {
+                'success': False,
+                'error': 'Processing failed',
+                'processing_time': 1.0
+            }
+
+            # Call the method
+            result = context_manager._process_files_with_duplicate_check(['/path/to/file.pdf'])
+
+            # Check results
+            assert result['new_files'] == 0
+            assert result['failed_files'] == 1
+            assert result['skipped_files'] == 0
+            assert len(result['processing_details']) == 1
+            assert result['processing_details'][0]['success'] is False

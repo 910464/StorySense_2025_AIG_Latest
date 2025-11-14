@@ -2,6 +2,7 @@ import pytest
 import base64
 import logging
 import os
+import sys
 from unittest.mock import Mock, patch, MagicMock, mock_open
 from src.llm_layer.image_parser_llm import ImageParserLLM
 from src.llm_layer.model_manual_test_llm import LLM
@@ -12,7 +13,7 @@ class TestImageParserLLM:
     """Comprehensive test suite for ImageParserLLM class"""
 
     @pytest.fixture
-    def metrics_manager_mock(self):
+    def global_metrics_manager_mock(self):
         """Mock metrics manager fixture"""
         return Mock(spec=MetricsManager)
 
@@ -22,13 +23,13 @@ class TestImageParserLLM:
         return Mock(spec=LLM)
 
     @pytest.fixture
-    def image_parser(self, metrics_manager_mock):
+    def image_parser(self, global_metrics_manager_mock):
         """ImageParserLLM instance with mocked LLM"""
         with patch('src.llm_layer.image_parser_llm.LLM') as mock_llm_class:
             mock_llm_instance = Mock(spec=LLM)
             mock_llm_class.return_value = mock_llm_instance
             
-            parser = ImageParserLLM(metrics_manager=metrics_manager_mock)
+            parser = ImageParserLLM(metrics_manager=global_metrics_manager_mock)
             parser.llm = mock_llm_instance
             return parser
 
@@ -51,15 +52,15 @@ class TestImageParserLLM:
     # ==================== Initialization Tests ====================
 
     @patch('src.llm_layer.image_parser_llm.LLM')
-    def test_initialization_with_metrics_manager(self, mock_llm_class, metrics_manager_mock):
+    def test_initialization_with_metrics_manager(self, mock_llm_class, global_metrics_manager_mock):
         """Test initialization with metrics manager"""
         mock_llm_instance = Mock(spec=LLM)
         mock_llm_class.return_value = mock_llm_instance
         
-        parser = ImageParserLLM(metrics_manager=metrics_manager_mock)
+        parser = ImageParserLLM(metrics_manager=global_metrics_manager_mock)
         
         # Verify LLM was initialized with metrics manager
-        mock_llm_class.assert_called_once_with(metrics_manager=metrics_manager_mock)
+        mock_llm_class.assert_called_once_with(metrics_manager=global_metrics_manager_mock)
         assert parser.llm == mock_llm_instance
         assert isinstance(parser.logger, logging.Logger)
         assert parser.logger.name == "src.llm_layer.image_parser_llm"
@@ -241,7 +242,7 @@ class TestImageParserLLM:
             mock_llm_class.assert_called_once_with(metrics_manager=None)
             mock_llm_instance.send_request_multimodal.assert_called_once()
 
-    def test_llm_integration_with_metrics(self, metrics_manager_mock, mock_image_path):
+    def test_llm_integration_with_metrics(self, global_metrics_manager_mock, mock_image_path):
         """Test LLM integration with metrics manager"""
         with patch('src.llm_layer.image_parser_llm.LLM') as mock_llm_class:
             mock_llm_instance = Mock(spec=LLM)
@@ -249,13 +250,13 @@ class TestImageParserLLM:
             mock_llm_instance.send_request_multimodal.return_value = "Metrics test result"
             
             # Create parser with metrics manager
-            parser = ImageParserLLM(metrics_manager=metrics_manager_mock)
+            parser = ImageParserLLM(metrics_manager=global_metrics_manager_mock)
             
             # Execute parsing
             result = parser.parse_image(mock_image_path)
             
             # Verify metrics manager was passed to LLM
-            mock_llm_class.assert_called_once_with(metrics_manager=metrics_manager_mock)
+            mock_llm_class.assert_called_once_with(metrics_manager=global_metrics_manager_mock)
             assert result == "Metrics test result"
 
 

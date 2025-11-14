@@ -26,12 +26,15 @@ class StorySenseAnalyzer:
         # Pass metrics_manager to LLM
         self.llm = LLM(llm_family, metrics_manager=self.metrics_manager)
         self.llm_family = llm_family
-        self.config_path = '../Config'
+        self.config_path = os.path.join(os.path.dirname(__file__), '..', 'Config')
 
         # Load AWS config if using AWS
         if llm_family == 'AWS':
             self.config_parser_aws = configparser.ConfigParser()
-            self.config_parser_aws.read(os.path.join(self.config_path, 'ConfigAWS.properties'))
+            config_file_path = os.path.join(self.config_path, 'ConfigAWS.properties')
+            self.config_parser_aws.read(config_file_path)
+            print(f"📁 Loading config from: {config_file_path}")
+            print(f"📋 Available sections: {self.config_parser_aws.sections()}")
 
     def analyze_user_story(self, user_story_data):
         """
@@ -42,14 +45,36 @@ class StorySenseAnalyzer:
         context = user_story_data["context"]
         context_file_types = user_story_data.get("context_file_types", {})
 
-        # Updated prompt template with reference example, enhanced output structure, and file type info
-        prompt_template = """
-        You are an expert user story analyzer. Your task is to analyze the following user story and provide insights.
+        # Combine ConfigAWS.properties prompts with hardcoded structured analysis
+        config_prompt = ""
+        config_instruction = ""
+        
+        if self.llm_family == 'AWS':
+            if context:
+                # Use context-enabled prompts from configuration
+                config_prompt = self.config_parser_aws.get('StorySense', 'story_sense_prompt', fallback="")
+                config_instruction = self.config_parser_aws.get('StorySense', 'story_sense_instruction', fallback="")
+                
+                from colorama import Fore, Style
+                print(f"{Fore.GREEN}📋 Using context-enabled prompts from ConfigAWS.properties{Style.RESET_ALL}")
+            else:
+                # Use no-context prompts from configuration
+                config_prompt = self.config_parser_aws.get('NoContext', 'story_sense_nocontext_prompt', fallback="")
+                config_instruction = self.config_parser_aws.get('NoContext', 'story_sense_nocontext_instruction', fallback="")
+                
+                from colorama import Fore, Style
+                print(f"{Fore.YELLOW}📋 Using no-context prompts from ConfigAWS.properties{Style.RESET_ALL}")
+
+        # Combine config prompts with hardcoded structured analysis template
+        prompt_template = f"""
+        {config_prompt}
+        
+        {config_instruction}
 
         USER STORY:
-        {userstory}
+        {{userstory}}
 
-        {context_prompt}
+        {{context_prompt}}
 
         Use this high-quality user story as a reference for scoring (rated 10 for each quality parameter):
         Title: Online payment option for utility bills 

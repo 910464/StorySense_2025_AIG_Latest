@@ -8,13 +8,13 @@ from src.context_handler.context_storage_handler.pgvector_store import PGVectorS
 
 class TestPGVectorStore:
     @pytest.fixture
-    def mock_orchestrator(self, metrics_manager_mock, mock_db_connector):
+    def mock_orchestrator(self, global_metrics_manager_mock, mock_db_connector):
         """Create a mock orchestrator for testing"""
         mock_orch = Mock()
         mock_orch.db = mock_db_connector
         mock_orch.embeddings = Mock()
         mock_orch.metrics_reporter = Mock()
-        mock_orch.metrics_manager = metrics_manager_mock
+        mock_orch.metrics_manager = global_metrics_manager_mock
         mock_orch.collection_name = "test_collection"
         return mock_orch
 
